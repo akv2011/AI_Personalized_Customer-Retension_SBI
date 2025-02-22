@@ -32,36 +32,7 @@ Our solution is an intelligent chatbot powered by **Retrieval-Augmented Generati
 *   **Interactive Frontend (React):**  Features a user-friendly and engaging chat interface built with React, providing a seamless customer experience.
 *   **Easy to Extend:**  Modular architecture allows for future enhancements like integration with Language Models (LLMs) for more sophisticated response generation, sentiment analysis, and deeper customer profile enrichment.
 
-## File Structure
-Use code with caution.
-Markdown
-sbi_life_chatbot/ (Project Root Directory)
-├── backend/ (Backend - Python/Flask)
-│ ├── src/ (Backend Source Code)
-│ │ ├── data/ (Data Handling - example data, data loading scripts)
-│ │ ├── models/ (AI Models - if any additional models are added)
-│ │ ├── vector_database/ (Pinecone Vector Database Client)
-│ │ ├── embedding_service/ (Sentence Transformer Embedding Generator)
-│ │ ├── personalization_engine/ (Core Personalization Logic - RAG Engine)
-│ │ ├── api/ (Flask API - endpoints)
-│ │ ├── config/ (Configuration Files - API Keys, etc.)
-│ │ ├── utils/ (Utility Modules)
-│ │ └── init.py
-│ ├── requirements.txt (Backend Python dependencies)
-│ └── run.py (Script to run the Flask backend)
-├── frontend/ (Frontend - React)
-│ ├── src/ (React Source Code)
-│ │ ├── components/ (React Components - Chat Interface)
-│ │ ├── App.js
-│ │ ├── index.js
-│ │ └── ...
-│ ├── public/ (Public assets)
-│ ├── package.json (Frontend dependencies)
-│ └── ...
-├── data/ (Optional - can store sample data files here)
-├── .gitignore (Git ignore file)
-├── README.md (This file)
-└── LICENSE (License file, if applicable)
+
 
 ## Getting Started
 
