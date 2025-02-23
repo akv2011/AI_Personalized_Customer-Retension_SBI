@@ -9,19 +9,19 @@ PINECONE_INDEX_NAME = "sbi-life-conversations-index"
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 
 
-print(f"Config: PINECONE_API_KEY is set to: {PINECONE_API_KEY is not None}") # Check if API_KEY is None or not
+print(f"Config: PINECONE_API_KEY is set to: {PINECONE_API_KEY is not None}") 
 if PINECONE_API_KEY:
-    print(f"Config: PINECONE_API_KEY (first 8 chars): {PINECONE_API_KEY[:8]}...") # Print first 8 chars if it's set
+    print(f"Config: PINECONE_API_KEY (first 8 chars): {PINECONE_API_KEY[:8]}...") 
 else:
     print("Config: PINECONE_API_KEY is EMPTY")
 
-print(f"Config: PINECONE_ENVIRONMENT is set to: {PINECONE_ENVIRONMENT is not None}") # Check if ENVIRONMENT is None or not
+print(f"Config: PINECONE_ENVIRONMENT is set to: {PINECONE_ENVIRONMENT is not None}") 
 if PINECONE_ENVIRONMENT:
-    print(f"Config: PINECONE_ENVIRONMENT: {PINECONE_ENVIRONMENT}") # Print Environment if it's set
+    print(f"Config: PINECONE_ENVIRONMENT: {PINECONE_ENVIRONMENT}") 
 else:
     print("Config: PINECONE_ENVIRONMENT is EMPTY")
 
-print(f"Config: PINECONE_INDEX_NAME: {PINECONE_INDEX_NAME}") # Print Index Name
+print(f"Config: PINECONE_INDEX_NAME: {PINECONE_INDEX_NAME}") 
 
 if not OPENAI_API_KEY:
-    print("Warning: OPENAI_API_KEY is not set in environment variables. OpenAI functionality will be limited.") # Optional warning, or raise error if you want to enforce it
+    print("Warning: OPENAI_API_KEY is not set in environment variables. OpenAI functionality will be limited.") 
