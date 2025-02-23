@@ -1,120 +1,103 @@
-# AI-Powered Customer Retention & Personalization for SBI Life
+# AI-Powered Personalized Customer Retention Chatbot for SBI Life Insurance
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Contribute](https://img.shields.io/badge/Contributions-Welcome-brightgreen.svg)](CONTRIBUTING.md)
 
-## **Project Overview**
-This project implements an **AI-driven chatbot** to enhance customer interaction for **SBI Life Insurance**. Unlike traditional persona-based approaches, this chatbot utilizes **Retrieval-Augmented Generation (RAG)** and **Vector Database (Pinecone)** to offer **hyper-personalized experiences**, increasing customer satisfaction, policy persistency, and conversion rates.
+This project leverages AI to enhance customer retention for SBI Life Insurance by moving beyond persona-based recommendations to deliver truly personalized, individual-centric experiences.  The chatbot analyzes customer interactions to understand their unique preferences and needs, optimizing upselling strategies and improving customer persistency.
 
-### **Problem Statement**
-SBI Life currently employs a **persona-based recommendation system**, which limits deep personalization. This results in **generic recommendations** that do not effectively engage customers, affecting **conversion rates and retention**.
+## Project Description
 
-### **Solution**
-Our intelligent chatbot dynamically adapts to each customer by:
-✅ **Deepening Individual Insights** – Stores & analyzes past interactions to build a **rich customer profile**.  
-✅ **Optimizing Upselling Strategies** – AI suggests tailored **policy terms, coverage, and duration** based on successful interactions.  
-✅ **Improving Customer Persistency** – Engages customers with **relevant and meaningful conversations**, reducing policy lapses.  
+SBI Life currently utilizes a broad, persona-based approach for customer recommendations, which lacks individual-level depth and often fails to resonate with unique customer preferences. This project aims to solve this by building an AI-driven chatbot that:
 
-## **Key Features**
-✔️ **Personalized AI Conversations** – Uses past interactions for **context-aware responses**.  
-✔️ **Retrieval-Augmented Generation (RAG)** – Improves chatbot responses with **relevant historical data and various SBI_Guide docs knowledge**.  
-✔️ **Vector Database (Pinecone)** – Efficiently stores and retrieves conversation embeddings for **fast similarity searches**.  
-✔️ **Sentence Transformer Embeddings** – Captures **semantic meaning** for accurate context matching.  
-✔️ **Scalable Flask Backend** – Ensures **robust and seamless integration** with SBI Life’s ecosystem.  
-✔️ **Interactive React Frontend** – Provides a **smooth, user-friendly chat experience**.  
-✔️ **Future-Ready Architecture** – Supports **LLM integration, sentiment analysis, and deep profile enrichment**.  
+*   **Deepens Individual-Centric Insights:**  Develops a personalized understanding of customer behavior, preferences, and needs based on their interactions.
+*   **Optimizes Upselling Strategies:** Suggests tailored policy terms, ticket prices, and durations to increase customer satisfaction and policy upgrades.
+*   **Improves Customer Persistency:** Enhances the likelihood of prospective customers closing deals and existing customers maintaining their policies by providing relevant and personalized guidance.
 
----
-## **Getting Started**
-### **Prerequisites**
-- **Python 3.7+**
-- **Node.js & npm (or yarn)**
-- **Pinecone API Key & Environment** (Create an account at [Pinecone](https://app.pinecone.io/))
+This chatbot leverages Retrieval-Augmented Generation (RAG) with OpenAI to provide contextually relevant and personalized responses based on similar past customer interactions stored in a vector database.
 
-### **Installation & Setup**
-#### **1. Clone the Repository**
-```bash
-git clone [repository URL]
-cd sbi_life_chatbot
-```
+## Tech Stack
 
-#### **2. Set Up Backend**
-```bash
-cd backend
-python -m venv venv
-source venv/bin/activate  # On Linux/macOS
-# venv\Scripts\activate  # On Windows
-pip install -r requirements.txt
-```
+*   **Frontend:**
+    *   React
+    *   JavaScript (ES6+)
+    *   CSS
+    *   npm/Node.js
+    *   Lucide React (Icons)
 
-Create a `.env` file and add your Pinecone credentials:
-```plaintext
-PINECONE_API_KEY=YOUR_PINECONE_API_KEY
-PINECONE_ENVIRONMENT=YOUR_PINECONE_ENVIRONMENT
-```
+*   **Backend:**
+    *   Python
+    *   Flask
+    *   Sentence Transformers (for embeddings)
+    *   LLM (for response generation)
+    *   Pinecone (Vector Database)
+    *   PyMuPDF (for PDF processing)
 
-#### **3. Set Up Pinecone Index**
-Ensure you create a Pinecone index named `sbi-life-conversations-index` (dimension: 384, cosine similarity).
+## Problem Statement
 
-#### **4. Run Backend**
-```bash
-python run.py
-```
-API will be available at `http://127.0.0.1:5000`.
+SBI Life currently relies on a 1000+ user persona-based approach for customer behavior recommendation, which limits the depth of individual-centric analysis and fails to resonate with their unique preference, reducing the likelihood of conversion.
 
-#### **5. Set Up Frontend**
-```bash
-cd ../frontend
-npm install  # or yarn install
-npm start  # or yarn start
-```
-Frontend will open at `http://localhost:3000`.
+## Goal
 
-### **Usage**
-1. Open the chatbot at `http://localhost:3000`.
-2. Start interacting by typing queries.
-3. Experience **personalized AI responses** based on past interactions.
+To leverage AI to:
 
----
-## **Technologies Used**
-### **Backend**
-- Python
-- Flask (Web Framework)
-- Sentence Transformers (Embeddings)
-- Pinecone (Vector Database)
-- dotenv (Environment Variables)
+*   **Deepen individual-centric insights:** Develop a more personalized understanding of customer behavior, preferences, and needs.
+*   **Optimize upselling strategies:** Suggest tailored policy terms, ticket prices, and durations to increase customer satisfaction and retention.
+*   **Improve customer persistency:** Enhance the likelihood of prospective customers closing deals and existing customers maintaining their policies.
 
-### **Frontend**
-- React.js
-- Lucide React (Icons)
-- Tailwind CSS (Styling)
+## Key Features
 
-### **Cloud & Security**
-- AWS/GCP/Azure (for scalability)
-- OAuth 2.0 / JWT Authentication
-- GDPR-compliant data handling
+*   **Personalized Chatbot Interface:** A user-friendly React-based chatbot interface for customer interaction.
+*   **AI-Powered Recommendations:**  Utilizes Custom_LLM and RAG to generate personalized responses and recommendations based on context and past interactions.
+*   **Vector Database (Pinecone) Integration:** Stores and retrieves conversation embeddings for semantic similarity search and personalized context.
+*   **Dynamic Persona Creation:**  For returning customers, the chatbot builds a dynamic "persona" based on their individual interaction history.
+*   **Similarity-Based Guidance:** For new customers, the chatbot leverages similar past customer interactions to guide them towards successful purchase paths.
+*   **Scalable Backend:**  Built with Flask and Python for a modular and scalable backend architecture.
+*   **PDF Data Ingestion:**  Includes scripts to ingest PDF policy documents into the Pinecone knowledge base.
+*   **Audio Support (Future Enhancement):**  Planned feature to enable voice input and output for a more seamless user experience.
+*   **Accurate RAG with SBI Data Sources:**  Focuses on utilizing official SBI Life data sources to ensure accurate and reliable information retrieval for RAG.
+*   **Sales and Support Guidance:** Aims to provide effective sales guidance and customer support information within the chatbot conversations.
+*   **Multi-Language Support (Future Enhancement):**  Intended to support multiple languages, including Hindi and English, to cater to a wider customer base.
+*   **Individual Customer Persona:** Leverages historical customer data to create and refine individual customer personas for deeper personalization.
+*   **And More:**  Continuously evolving with new features and improvements to enhance customer retention and personalization.
 
----
-## **Challenges & Future Enhancements**
-### **Current Challenges**
-🚧 **Basic RAG Implementation** – Further tuning required for improved retrieval accuracy.  
-🚧 **Limited Personalization** – Future AI models will integrate customer profiles and preferences.  
-🚧 **No LLM Integration (Yet)** – Placeholder-based responses will evolve into **LLM-powered natural responses**.  
+## Getting Started
 
-### **Future Enhancements**
-🚀 **Integrate a Language Model (LLM)** – For **fluent, AI-generated responses**.  
-🚀 **Advanced RAG Techniques** – Query expansion, re-ranking, and prompt optimization.  
-🚀 **Sentiment Analysis** – Detects emotions for **enhanced customer engagement**.  
-🚀 **Customer Profile Enrichment** – Expands personalization using **demographics & policy history**.  
-🚀 **Real-time Data Ingestion** – Keeps chatbot up-to-date with latest **policy details**.  
-🚀 **Cloud Deployment** – Scalable hosting for **production-ready implementation**.  
+To run this project locally, follow these steps:
 
----
-## **License**
-[MIT License](LICENSE)  
+**Backend Setup:**
 
-## **Author**
-ARUNKUMAR V     - [GitHub Profile]](https://github.com/akv2011) - arunkumarv1530@gmail.com
-HARIHARA SUDHAN - [[GitHub Profile]](https://github.com/Harihara04sudhan) - harisudhan2284@gmail.com
+1.  Navigate to the `backend` directory: `cd backend`
+2.  Create a virtual environment (optional but recommended): `python -m venv venv`
+3.  Activate the virtual environment:
+    *   On Windows: `venv\Scripts\activate`
+    *   On macOS/Linux: `source venv/bin/activate`
+4.  Install backend dependencies: `pip install -r requirements.txt`
+5.  Set your environment variables:
+    *   `PINECONE_API_KEY`
+    *   `PINECONE_ENVIRONMENT`
+    *   `PINECONE_INDEX_NAME`
+    (You can set these in a `.env` file in the `backend` directory)
+6.  Run the Flask backend: `python run.py`
 
-💡 *Feel free to contribute! Submit PRs or issues to enhance this project.* 🚀
+**Frontend Setup:**
 
+1.  Navigate to the `frontend` directory: `cd frontend`
+2.  Install frontend dependencies: `npm install` or `yarn install`
+3.  Start the React frontend development server: `npm start` or `yarn start`
+
+The chatbot interface should now be accessible in your browser, usually at `http://localhost:3000`. The backend API will be running at `http://127.0.0.1:5000`.
+
+## Contributing
+
+This project is open for contributions! If you'd like to contribute to enhance this project, please feel free to submit Pull Requests or create Issues to discuss potential improvements and bug fixes.
+
+**Contributors:**
+
+*   **ARUNKUMAR V:** [GitHub Profile](https://github.com/akv2011)
+*   **HARIHARA SUDHAN:** [GitHub Profile](GitHub Profile URL - Please add your GitHub URL here)
+
+**Contact:**
+
+*   arunkumarv1530@gmail.com
+*   harisudhan2284@gmail.com
+
+💡 Feel free to contribute! Submit PRs or issues to enhance this project. 🚀
