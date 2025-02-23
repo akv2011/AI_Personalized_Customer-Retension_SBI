@@ -93,7 +93,7 @@ This project is open for contributions! If you'd like to contribute to enhance t
 **Contributors:**
 
 *   **ARUNKUMAR V:** [GitHub Profile](https://github.com/akv2011)
-*   **HARIHARA SUDHAN:** [GitHub Profile](GitHub Profile URL - Please add your GitHub URL here)
+*   **HARIHARA SUDHAN:** [GitHub Profile](https://github.com/Harihara04sudhan)
 
 **Contact:**
 
