@@ -1,15 +1,14 @@
-# backend/src/vector_database/vector_db_client.py
 import pinecone
-from src.config import config  # Import config to access Pinecone settings
-from pinecone import Pinecone, ServerlessSpec # Import Pinecone class
+from src.config import config  
+from pinecone import Pinecone, ServerlessSpec
 
 class VectorDBClient:
     def __init__(self):
         """Initializes the Pinecone client and connects to the specified index."""
-        self.pc = Pinecone(  # Use Pinecone class for initialization
-            api_key=config.PINECONE_API_KEY # Initialize with just the API Key
+        self.pc = Pinecone( 
+            api_key=config.PINECONE_API_KEY
         )
-        self.index = self.pc.Index(config.PINECONE_INDEX_NAME) # Get index using the Pinecone instance
+        self.index = self.pc.Index(config.PINECONE_INDEX_NAME) 
 
     def upsert_embedding(self, vector_id, embedding, metadata):
         """Upserts a vector to the Pinecone index."""
@@ -27,20 +26,20 @@ class VectorDBClient:
             return query_results
         except Exception as e:
             print(f"Error querying Pinecone: {e}")
-            return None # Indicate query failure
+            return None 
 
-    # Optional: Add methods for deleting vectors, fetching vectors, etc. if needed
+
 
 if __name__ == '__main__':
     # --- Example Usage (assuming you have Pinecone and config setup correctly) ---
     try:
         db_client = VectorDBClient()
-        embed_gen = EmbeddingGenerator() # Assuming EmbeddingGenerator is defined (see next code block)
+        embed_gen = EmbeddingGenerator() 
 
-        # Example: Upsert a test vector
+      
         test_vector_id = "TEST_VECTOR_001"
         test_text_to_embed = "This is a test vector for Pinecone."
-        test_embedding = embed_gen.get_embedding(test_text_to_embed) # Assuming EmbeddingGenerator.get_embedding exists
+        test_embedding = embed_gen.get_embedding(test_text_to_embed) 
         test_metadata = {"test_data": "example metadata", "text": test_text_to_embed}
 
         if db_client.upsert_embedding(test_vector_id, test_embedding, test_metadata):
@@ -48,7 +47,7 @@ if __name__ == '__main__':
         else:
             print(f"Test vector '{test_vector_id}' upsert failed.")
 
-        # Example: Query for similar vectors (using the same embedding as query for testing)
+
         query_results = db_client.query_similar_embeddings(test_embedding)
         if query_results and query_results.matches:
             print("\nQuery Results:")
