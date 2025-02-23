@@ -16,7 +16,7 @@ Our intelligent chatbot dynamically adapts to each customer by:
 
 ## **Key Features**
 ✔️ **Personalized AI Conversations** – Uses past interactions for **context-aware responses**.  
-✔️ **Retrieval-Augmented Generation (RAG)** – Improves chatbot responses with **relevant historical data**.  
+✔️ **Retrieval-Augmented Generation (RAG)** – Improves chatbot responses with **relevant historical data and various SBI_Guide docs knowledge**.  
 ✔️ **Vector Database (Pinecone)** – Efficiently stores and retrieves conversation embeddings for **fast similarity searches**.  
 ✔️ **Sentence Transformer Embeddings** – Captures **semantic meaning** for accurate context matching.  
 ✔️ **Scalable Flask Backend** – Ensures **robust and seamless integration** with SBI Life’s ecosystem.  
