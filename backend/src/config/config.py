@@ -6,6 +6,8 @@ load_dotenv()
 PINECONE_API_KEY = os.getenv("PINECONE_API_KEY")
 PINECONE_ENVIRONMENT = os.getenv("PINECONE_ENVIRONMENT")
 PINECONE_INDEX_NAME = "sbi-life-conversations-index"
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+
 
 print(f"Config: PINECONE_API_KEY is set to: {PINECONE_API_KEY is not None}") # Check if API_KEY is None or not
 if PINECONE_API_KEY:
@@ -20,3 +22,6 @@ else:
     print("Config: PINECONE_ENVIRONMENT is EMPTY")
 
 print(f"Config: PINECONE_INDEX_NAME: {PINECONE_INDEX_NAME}") # Print Index Name
+
+if not OPENAI_API_KEY:
+    print("Warning: OPENAI_API_KEY is not set in environment variables. OpenAI functionality will be limited.") # Optional warning, or raise error if you want to enforce it
