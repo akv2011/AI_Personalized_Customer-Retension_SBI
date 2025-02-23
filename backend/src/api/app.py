@@ -9,8 +9,8 @@ app = Flask(__name__)
 CORS(app) 
 recommender = RecommendationEngine()
 
-@app.route('/chat', methods=['POST']) # Renamed endpoint to /chat
-def chat_api(): # Renamed function to chat_api
+@app.route('/chat', methods=['POST'])
+def chat_api():
     try:
         data = request.get_json()
         customer_id = data.get('customer_id')
@@ -19,14 +19,12 @@ def chat_api(): # Renamed function to chat_api
         if not customer_id or not user_input_text:
             return jsonify({"error": "Missing customer_id or user_input_text"}), 400
 
-        recommender_response = recommender.process_user_interaction(customer_id, user_input_text) # Get response from recommender
-
-        # **Return the response from recommender to the frontend**
-        return jsonify(recommender_response), 200 # Return recommender_response
+        response = recommender.process_user_interaction(customer_id, user_input_text)
+        return jsonify(response), 200
 
     except Exception as e:
-        print(f"Error processing chat message: {e}")
-        return jsonify({"error": "Internal Server Error"}), 500
+        print(f"Error in chat_api: {str(e)}")
+        return jsonify({"error": "Server error", "message": str(e)}), 500
 
 if __name__ == '__main__':
     app.run(debug=True)
