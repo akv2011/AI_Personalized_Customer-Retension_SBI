@@ -113,6 +113,7 @@ Frontend will open at `http://localhost:3000`.
 [MIT License](LICENSE)  
 
 ## **Author**
+ARUNKUMAR V     - [GitHub Profile]](https://github.com/akv2011) - arunkumarv1530@gmail.com
 HARIHARA SUDHAN - [[GitHub Profile]](https://github.com/Harihara04sudhan) - harisudhan2284@gmail.com
 
 💡 *Feel free to contribute! Submit PRs or issues to enhance this project.* 🚀
