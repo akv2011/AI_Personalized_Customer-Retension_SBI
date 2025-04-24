@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Send, User, Bot, Paperclip, Mic, Circle, FileText, Calendar, Phone, Bell, Settings, Globe } from 'lucide-react';
 import MessageBubble from './MessageBubble';
 
@@ -26,6 +26,8 @@ const ChatInterface = () => {
   const [isRecording, setIsRecording] = useState(false);
   const [isThinking, setIsThinking] = useState(false);
   const [selectedLanguage, setSelectedLanguage] = useState('en');
+  const fileInputRef = useRef(null); // Ref for file input
+  const recognitionRef = useRef(null); // Ref for SpeechRecognition instance
 
   const languages = [
     { code: 'en', name: 'English' },
@@ -34,22 +36,25 @@ const ChatInterface = () => {
   ];
 
   const handleSend = async () => {
-    if (inputText.trim()) {
+    if (inputText.trim() && !isThinking) {
+      const currentInputText = inputText; // Capture current input
       const userMessage = {
         id: messages.length + 1,
         text: {
           sections: [
             {
               type: 'main_response',
-              content: inputText
+              content: currentInputText // Use captured input
             }
           ]
         },
         isBot: false
       };
-      setMessages([...messages, userMessage]);
+      setMessages((prev) => [...prev, userMessage]); // Use functional update
       setInputText('');
       setIsThinking(true);
+
+      console.log("Attempting to send message:", currentInputText); // Log 1: Before fetch
 
       try {
         const response = await fetch('http://127.0.0.1:5000/chat', {
@@ -57,53 +62,181 @@ const ChatInterface = () => {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             customer_id: 'USER_FRONTEND_TEST',
-            user_input_text: inputText,
-            language: selectedLanguage // Add language parameter
+            user_input_text: currentInputText, // Use captured input text
+            language: selectedLanguage
           }),
         });
 
-        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-        const data = await response.json();
+        console.log("Received response status:", response.status, response.statusText); // Log 2: After fetch, before checks
 
-        const botText = data.rag_response?.formatted_response || {
-          sections: [
-            {
-              type: 'main_response',
-              content: "I apologize, but I couldn't process that request."
-            }
-          ]
-        };
+        if (!response.ok) {
+          // Log the error response text if possible
+          const errorText = await response.text().catch(() => "Could not read error response body");
+          console.error("Fetch error response text:", errorText);
+          throw new Error(`HTTP error! status: ${response.status} - ${errorText}`);
+        }
+
+        console.log("Attempting to parse JSON response..."); // Log 3: Before response.json()
+        const data = await response.json();
+        console.log("Received data from backend:", JSON.stringify(data, null, 2)); // Log 4: After successful JSON parsing
+
+        // --- CHANGE HERE ---
+        // Check if data.response exists and is a non-empty string
+        const mainResponseContent = typeof data.response === 'string' && data.response.trim() ? data.response.trim() : null;
+
+        let botText;
+        if (mainResponseContent) {
+          // If we have a valid response string, format it correctly
+          botText = {
+            sections: [
+              {
+                type: 'main_response',
+                content: mainResponseContent
+              }
+            ]
+          };
+        } else {
+           // Otherwise, use the fallback message
+           console.warn("Backend response did not contain a valid 'response' string. Using fallback."); // Add a warning
+           botText = {
+            sections: [
+              {
+                type: 'main_response',
+                content: "I apologize, but I couldn't process that request."
+              }
+            ]
+          };
+        }
+        // --- END CHANGE ---
+
+        console.log("Parsed botText:", JSON.stringify(botText, null, 2)); // Log 5: After parsing botText
 
         setMessages((prev) => [
           ...prev,
           {
             id: prev.length + 1,
-            text: botText,
+            text: botText, // Use the correctly structured botText
             isBot: true,
           },
         ]);
       } catch (error) {
-        console.error('Chat error:', error);
+        // Log 6: Catch block - Make sure this logs any error encountered
+        console.error('!!! Critical Error in handleSend !!!:', error);
+        console.error('Error name:', error.name);
+        console.error('Error message:', error.message);
+        // Optionally log stack trace if available
+        if (error.stack) {
+            console.error('Error stack:', error.stack);
+        }
+
+        // Display a user-friendly error message in the chat
         setMessages((prev) => [
           ...prev,
           {
             id: prev.length + 1,
-            text: {
-              sections: [
-                {
-                  type: 'main_response',
-                  content: "I'm sorry, but I'm having trouble connecting right now. Please try again later."
-                }
-              ]
-            },
+            text: { sections: [{ type: 'main_response', content: `Error: Could not connect or process response. Details: ${error.message}` }] }, // Show error message in chat
             isBot: true,
+            isError: true // Optional: Add flag for styling error messages
           },
         ]);
       } finally {
+        console.log("Setting isThinking to false."); // Log 7: Finally block
         setIsThinking(false);
       }
     }
   };
+
+  // --- NEW: File Upload Handling ---
+  const handlePaperclipClick = () => {
+    fileInputRef.current.click(); // Trigger hidden file input
+  };
+
+  const handleFileChange = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      console.log('Selected file:', file.name);
+      // TODO: Implement actual file upload logic (e.g., send to backend)
+      // Reset file input value so the same file can be selected again
+      event.target.value = null;
+    }
+  };
+  // --- END NEW: File Upload Handling ---
+
+
+  // --- NEW: Voice Input Handling ---
+  useEffect(() => {
+    // Check if SpeechRecognition is available
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+      console.warn("Speech Recognition API not supported in this browser.");
+      return;
+    }
+
+    recognitionRef.current = new SpeechRecognition();
+    const recognition = recognitionRef.current;
+    recognition.continuous = false; // Process single utterances
+    recognition.interimResults = false; // Get final results only
+    recognition.lang = selectedLanguage; // Set language
+
+    recognition.onresult = (event) => {
+      const transcript = event.results[0][0].transcript;
+      console.log("Voice input transcript:", transcript);
+      setInputText(transcript); // Set input text with transcript
+      setIsRecording(false); // Stop recording state visually
+    };
+
+    recognition.onerror = (event) => {
+      console.error('Speech recognition error:', event.error);
+      setIsRecording(false); // Stop recording state visually on error
+    };
+
+    recognition.onend = () => {
+       // Check if it ended naturally or was aborted
+       // We only set isRecording to false here if it wasn't manually stopped
+       // or handled by onresult/onerror already.
+       // However, the current logic sets it false in onresult/onerror,
+       // so this might just be for cleanup or unexpected stops.
+       // Let's ensure it's false if the API stops for any reason.
+       if (isRecording) {
+           console.log("Recognition ended unexpectedly.");
+           setIsRecording(false);
+       }
+    };
+
+    // Cleanup function to stop recognition if component unmounts
+    return () => {
+      if (recognitionRef.current) {
+        recognitionRef.current.abort();
+      }
+    };
+  }, [selectedLanguage, isRecording]); // Re-run effect if language changes or isRecording changes (for cleanup)
+
+
+  const handleMicClick = () => {
+    const recognition = recognitionRef.current;
+    if (!recognition) {
+        console.error("Speech Recognition not initialized.");
+        return;
+    }
+
+    if (isRecording) {
+      recognition.stop();
+      console.log("Stopping voice recognition manually.");
+      setIsRecording(false);
+    } else {
+      try {
+        recognition.lang = selectedLanguage; // Ensure language is up-to-date
+        recognition.start();
+        console.log("Starting voice recognition...");
+        setIsRecording(true);
+      } catch (error) {
+          console.error("Error starting speech recognition:", error);
+          setIsRecording(false); // Ensure state is correct if start fails
+      }
+    }
+  };
+  // --- END NEW: Voice Input Handling ---
+
 
   return (
     <div className="flex flex-col h-screen max-w-2xl mx-auto bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 shadow-2xl rounded-lg overflow-hidden">
@@ -174,9 +307,21 @@ const ChatInterface = () => {
       {/* Input Area */}
       <div className="bg-white/90 backdrop-blur-sm p-4 border-t border-blue-100">
         <div className="flex gap-3 items-center">
-          <button className="p-3 bg-gradient-to-r from-blue-100 to-purple-100 text-blue-600 rounded-xl hover:from-blue-200 hover:to-purple-200 transition-all">
+          {/* --- MODIFIED: Paperclip Button --- */}
+          <input
+            type="file"
+            ref={fileInputRef}
+            onChange={handleFileChange}
+            style={{ display: 'none' }} // Hide the default input
+            accept="image/*,application/pdf,.doc,.docx,.txt" // Example file types
+          />
+          <button
+            onClick={handlePaperclipClick} // Use new handler
+            className="p-3 bg-gradient-to-r from-blue-100 to-purple-100 text-blue-600 rounded-xl hover:from-blue-200 hover:to-purple-200 transition-all"
+          >
             <Paperclip className="w-5 h-5" />
           </button>
+          {/* --- END MODIFIED: Paperclip Button --- */}
 
           <div className="flex-1 relative">
             <input
@@ -190,8 +335,9 @@ const ChatInterface = () => {
               className="w-full px-4 py-3 bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white pr-24 transition-all"
             />
             <div className="absolute right-2 top-1/2 -translate-y-1/2 flex gap-2">
+              {/* --- MODIFIED: Mic Button --- */}
               <button
-                onClick={() => setIsRecording(!isRecording)}
+                onClick={handleMicClick} // Use new handler
                 className={`p-2 rounded-xl transition-all ${
                   isRecording
                     ? 'bg-red-500 text-white animate-pulse'
@@ -200,6 +346,7 @@ const ChatInterface = () => {
               >
                 <Mic className="w-5 h-5" />
               </button>
+              {/* --- END MODIFIED: Mic Button --- */}
               <button
                 onClick={handleSend}
                 disabled={!inputText.trim()}

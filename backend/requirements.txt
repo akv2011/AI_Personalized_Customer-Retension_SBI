@@ -1,0 +1,10 @@
+faiss-cpu
+openai
+pypdf2
+flask
+python-dotenv
+google-generativeai
+pandas
+flask_cors
+deep_translator
+langchain # Added for text splitting

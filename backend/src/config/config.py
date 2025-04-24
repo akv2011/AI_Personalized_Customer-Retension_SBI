@@ -1,27 +1,25 @@
 import os
 from dotenv import load_dotenv
 
-load_dotenv()
+load_dotenv()  # Load environment variables from .env file
 
-PINECONE_API_KEY = os.getenv("PINECONE_API_KEY")
-PINECONE_ENVIRONMENT = os.getenv("PINECONE_ENVIRONMENT")
-PINECONE_INDEX_NAME = "sbi-life-conversations-index"
+# --- API Keys ---
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY") # Add Google API Key
 
+# --- FAISS Configuration ---
+# Define the path for the FAISS index file relative to the backend directory
+BACKEND_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__))) # Points to the 'src' directory's parent
+FAISS_INDEX_PATH = os.path.join(BACKEND_DIR, "faiss_index.idx")
+SYSTEM_PROMPT_PATH = os.path.join(os.path.dirname(__file__), "system_prompt.txt") # Path to the system prompt file
 
-print(f"Config: PINECONE_API_KEY is set to: {PINECONE_API_KEY is not None}") 
-if PINECONE_API_KEY:
-    print(f"Config: PINECONE_API_KEY (first 8 chars): {PINECONE_API_KEY[:8]}...") 
-else:
-    print("Config: PINECONE_API_KEY is EMPTY")
+# --- Other Configurations (if any) ---
+# Example: Default language
+DEFAULT_LANGUAGE = "en"
 
-print(f"Config: PINECONE_ENVIRONMENT is set to: {PINECONE_ENVIRONMENT is not None}") 
-if PINECONE_ENVIRONMENT:
-    print(f"Config: PINECONE_ENVIRONMENT: {PINECONE_ENVIRONMENT}") 
-else:
-    print("Config: PINECONE_ENVIRONMENT is EMPTY")
-
-print(f"Config: PINECONE_INDEX_NAME: {PINECONE_INDEX_NAME}") 
-
-if not OPENAI_API_KEY:
-    print("Warning: OPENAI_API_KEY is not set in environment variables. OpenAI functionality will be limited.") 
+# --- Validation (Optional but recommended) ---
+# You might want to add checks here to ensure necessary keys are set
+# if not GOOGLE_API_KEY:
+#     print("Warning: GOOGLE_API_KEY environment variable not set.")
+# if not OPENAI_API_KEY:
+#     print("Warning: OPENAI_API_KEY environment variable not set.")
