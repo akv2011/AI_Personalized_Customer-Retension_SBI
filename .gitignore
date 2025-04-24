@@ -59,3 +59,6 @@ wheels
 *.sln
 *.pdb
 *.user
+
+# Documentation / Planning files
+implementation.md
