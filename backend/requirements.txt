@@ -1,3 +1,4 @@
+
 faiss-cpu
 openai
 pypdf2
@@ -8,3 +9,4 @@ pandas
 flask_cors
 deep_translator
 langchain # Added for text splitting
+
