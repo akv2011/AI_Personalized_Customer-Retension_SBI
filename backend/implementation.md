@@ -84,3 +84,144 @@ This document outlines the steps required to replace the Pinecone vector databas
     * Detect the user's language and respond in the same language.
     * Analyze sentiment of the user's message and adjust the tone (empathetic, enthusiastic, neutral, etc.) accordingly.
     * Return both the answer and the detected sentiment in the response payload (for frontend use).
+
+# SBI Life Chat Implementation Details
+
+## Brave Search Integration
+
+### Overview
+The Brave Search integration adds powerful web search capabilities to the chat interface. Users can toggle between normal chat mode and Brave Search mode using a dedicated button in the interface.
+
+### Frontend Implementation
+- Added a toggle button for Brave Search mode in `ChatInterface.js`
+- State management for search mode using `isBraveSearchActive` 
+- Modified request handling to use different endpoints based on active mode
+- Visual feedback for active search mode through button styling
+
+### Backend Implementation
+The backend exposes a new `/brave_search` endpoint that:
+- Accepts search queries from the frontend
+- Makes authenticated requests to the Brave Search API
+- Processes and formats search results for chat display
+- Handles pagination and result counts
+- Provides fallback behavior when no results are found
+
+### Configuration
+1. Obtain a Brave Search API key:
+   - Sign up at https://brave.com/search/api/
+   - Choose a plan (Free tier: 2,000 queries/month)
+   - Generate API key from dashboard
+
+2. Set up environment variable:
+   ```bash
+   export BRAVE_API_KEY=your_api_key_here
+   ```
+
+### API Usage
+- **Web Search Endpoint**: `https://api.search.brave.com/res/v1/web/search`
+- **Local Search Endpoint**: `https://api.search.brave.com/res/v1/places/search`
+- **Headers**:
+  - Accept: application/json
+  - Accept-Encoding: gzip
+  - X-Subscription-Token: YOUR_API_KEY
+
+### Features
+1. Web Search
+   - General web queries
+   - News and articles
+   - Pagination support
+   - Freshness controls
+
+2. Local Search (Auto-fallback)
+   - Business and service lookups
+   - Location-based results
+   - Falls back to web search if no local results
+
+3. Result Processing
+   - Formats results for chat display
+   - Shows titles and snippets
+   - Limited to top 3 results per query
+   - Error handling and user feedback
+
+### Usage
+1. Click the search icon (🔍) to toggle Brave Search mode
+2. Enter your search query
+3. Results will be displayed in chat format
+4. Click the search icon again to return to normal chat mode
+
+### Error Handling
+- API connection failures
+- Missing API key detection
+- No results found scenarios
+- Rate limit handling
+
+### Future Improvements
+- Add support for different result types (images, news)
+- Implement advanced filtering options
+- Add location-based search preferences
+- Integrate with chat history for context
+
+## Google Gemini Search Integration
+
+### Overview
+The Google Gemini Search integration adds powerful AI-driven search capabilities to the chat interface with grounding in our knowledge base. Users can toggle between normal chat mode and Gemini Search mode using a dedicated button in the interface.
+
+### Frontend Implementation
+- Added a toggle button for Gemini Search mode in `ChatInterface.js`
+- State management using `isGeminiSearchActive` 
+- Modified request handling to use different endpoints based on active mode
+- Visual feedback for active search mode through button styling
+
+### Backend Implementation
+The backend exposes a new `/gemini_search` endpoint that:
+- Accepts search queries from the frontend
+- Retrieves relevant context from the vector database (FAISS)
+- Makes grounded requests to the Google Gemini API
+- Processes and formats search results for chat display
+- Handles translations for multi-language support
+- Provides fallback behavior when no results are found
+
+### Configuration
+1. Obtain a Google AI API key:
+   - Set up a Google Cloud project
+   - Enable the Gemini API
+   - Generate an API key
+   - Add it to your environment variables:
+   ```bash
+   export GOOGLE_API_KEY=your_api_key_here
+   ```
+
+### Features
+1. Grounded Search
+   - Uses existing knowledge base for context
+   - Leverages FAISS vector search for relevant documents
+   - Enhances responses with document-grounded information
+
+2. Multi-Language Support
+   - Automatic translation of queries and responses
+   - Maintains context across languages
+   - Preserves original English responses
+
+3. Smart Response Processing
+   - Combines vector search results with Gemini's capabilities
+   - Formats responses for chat display
+   - Ensures accurate insurance-related information
+
+### Usage
+1. Click the search icon (🔍) to toggle Gemini Search mode
+2. Enter your query
+3. Results will be displayed in chat format, incorporating relevant knowledge base content
+4. Click the search icon again to return to normal chat mode
+
+### Error Handling
+- API connection failures
+- Missing API key detection
+- No results found scenarios
+- Translation errors
+- Vector search failures
+
+### Future Improvements
+- Add support for different result types
+- Implement advanced context window management
+- Add streaming responses
+- Enhance grounding with dynamic context selection

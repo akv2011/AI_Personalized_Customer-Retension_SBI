@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Send, User, Bot, Paperclip, Mic, Circle, FileText, Calendar, Phone, Bell, Settings, Globe } from 'lucide-react';
+import { Send, User, Bot, Paperclip, Mic, Circle, FileText, Calendar, Phone, Bell, Settings, Globe, Search } from 'lucide-react'; // Added Search icon
 import MessageBubble from './MessageBubble';
 
 const ChatInterface = () => {
@@ -26,6 +26,7 @@ const ChatInterface = () => {
   const [isRecording, setIsRecording] = useState(false);
   const [isThinking, setIsThinking] = useState(false);
   const [selectedLanguage, setSelectedLanguage] = useState('en');
+  const [isGeminiSearchActive, setIsGeminiSearchActive] = useState(false); // <-- New state for Gemini Search toggle
   const fileInputRef = useRef(null); // Ref for file input
   const recognitionRef = useRef(null); // Ref for SpeechRecognition instance
 
@@ -55,17 +56,25 @@ const ChatInterface = () => {
       setIsThinking(true);
 
       console.log("Attempting to send message:", currentInputText); // Log 1: Before fetch
+      console.log("Gemini Search Active:", isGeminiSearchActive); // Log if Gemini Search is active
 
       try {
-        const response = await fetch('http://127.0.0.1:5000/chat', {
+        // <-- Modified fetch logic -->
+        const endpoint = isGeminiSearchActive ? 'http://127.0.0.1:5000/gemini_search' : 'http://127.0.0.1:5000/chat';
+        const body = isGeminiSearchActive
+          ? JSON.stringify({ query: currentInputText })
+          : JSON.stringify({
+              customer_id: 'USER_FRONTEND_TEST',
+              user_input_text: currentInputText, // Use captured input text
+              language: selectedLanguage
+            });
+
+        const response = await fetch(endpoint, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            customer_id: 'USER_FRONTEND_TEST',
-            user_input_text: currentInputText, // Use captured input text
-            language: selectedLanguage
-          }),
+          body: body,
         });
+        // <-- End modified fetch logic -->
 
         console.log("Received response status:", response.status, response.statusText); // Log 2: After fetch, before checks
 
@@ -102,7 +111,7 @@ const ChatInterface = () => {
             sections: [
               {
                 type: 'main_response',
-                content: "I apologize, but I couldn't process that request."
+                content: isGeminiSearchActive ? "Sorry, I couldn't find relevant search results." : "I apologize, but I couldn't process that request."
               }
             ]
           };
@@ -237,6 +246,12 @@ const ChatInterface = () => {
   };
   // --- END NEW: Voice Input Handling ---
 
+  // <-- New handler for Gemini Search button -->
+  const handleGeminiSearchToggle = () => {
+    setIsGeminiSearchActive(prev => !prev);
+    console.log("Gemini Search toggled:", !isGeminiSearchActive);
+  };
+  // <-- End new handler -->
 
   return (
     <div className="flex flex-col h-screen max-w-2xl mx-auto bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 shadow-2xl rounded-lg overflow-hidden">
@@ -347,6 +362,21 @@ const ChatInterface = () => {
                 <Mic className="w-5 h-5" />
               </button>
               {/* --- END MODIFIED: Mic Button --- */}
+
+              {/* <-- New Gemini Search Toggle Button --> */}
+              <button
+                onClick={handleGeminiSearchToggle}
+                title={isGeminiSearchActive ? "Disable Gemini Search" : "Enable Gemini Search"}
+                className={`p-2 rounded-xl transition-all ${
+                  isGeminiSearchActive
+                    ? 'bg-blue-500 text-white' // Style when active
+                    : 'bg-gradient-to-r from-blue-100 to-purple-100 text-blue-600' // Style when inactive
+                }`}
+              >
+                <Search className="w-5 h-5" />
+              </button>
+              {/* <-- End New Gemini Search Toggle Button --> */}
+
               <button
                 onClick={handleSend}
                 disabled={!inputText.trim()}
