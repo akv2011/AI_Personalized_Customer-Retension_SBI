@@ -1,34 +1,56 @@
-# backend/src/embedding_service/embedding_generator.py
-from sentence_transformers import SentenceTransformer
+import google.generativeai as genai
+from src.config.config import GOOGLE_API_KEY # Use Google API Key
 
 class EmbeddingGenerator:
-    def __init__(self, model_name="all-MiniLM-L6-v2"):
-        """Initializes the SentenceTransformer model."""
-        self.model = SentenceTransformer(model_name)
-        print(f"Embedding model '{model_name}' loaded.") # Optional: Confirmation log
-
-    def get_embedding(self, text):
-        """Generates a vector embedding for the given text."""
+    def __init__(self, model="models/embedding-001"):
+        """Initializes the Google Generative AI client."""
+        if not GOOGLE_API_KEY:
+            raise ValueError("GOOGLE_API_KEY environment variable not set.")
+        
         try:
-            embedding = self.model.encode(text, convert_to_tensor=False).tolist() # Convert to list for JSON serialization
+            genai.configure(api_key=GOOGLE_API_KEY)
+            self.model = model
+            # Optional: Test connection or list models to ensure key is valid
+            # models = [m for m in genai.list_models() if 'embedContent' in m.supported_generation_methods]
+            # print(f"Available Google embedding models: {models}") 
+            print(f"EmbeddingGenerator initialized with Google model: {self.model}")
+        except Exception as e:
+            print(f"Error configuring Google Generative AI: {e}")
+            raise
+
+    def get_embedding(self, text, task_type="RETRIEVAL_DOCUMENT"):
+        """Generates an embedding for the given text using the configured Google model.
+        
+        Args:
+            text: The text to embed.
+            task_type: The task type for the embedding. Common types include:
+                       RETRIEVAL_QUERY, RETRIEVAL_DOCUMENT, SEMANTIC_SIMILARITY,
+                       CLASSIFICATION, CLUSTERING.
+        """
+        try:
+            # Google API might have limits on text length per call
+            # Simple approach: Use the provided text directly.
+            # More robust: Handle potential errors related to text length.
+            if not text.strip():
+                print("Warning: Attempting to embed empty or whitespace-only text.")
+                return None # Or handle as appropriate
+                
+            result = genai.embed_content(
+                model=self.model,
+                content=text,
+                task_type=task_type
+            )
+            embedding = result['embedding']
+            # print(f"Generated Google embedding of dimension {len(embedding)} for task '{task_type}' and text snippet: '{text[:50]}...'") # Optional: for debugging
             return embedding
         except Exception as e:
-            print(f"Error generating embedding: {e}")
-            return None # Indicate embedding generation failure
+            print(f"Error generating Google embedding: {e}")
+            # Add more specific error handling if needed (e.g., for API key issues, quota limits)
+            return None
 
-if __name__ == '__main__':
-    # --- Example Usage ---
-    try:
-        embed_gen = EmbeddingGenerator()
-        sample_text = "This is a sample text to generate an embedding for."
-        embedding = embed_gen.get_embedding(sample_text)
-
-        if embedding:
-            print(f"Embedding generated successfully for: '{sample_text}'")
-            print(f"Embedding (first 10 dimensions): {embedding[:10]}...") # Print first few dimensions
-        else:
-            print(f"Embedding generation failed for: '{sample_text}'")
-
-    except Exception as e:
-        print(f"Error during EmbeddingGenerator example usage: {e}")
-        print("Make sure you have sentence-transformers library installed.")
+# --- Keep the old OpenAI class commented out or remove if no longer needed ---
+# import openai
+# from openai import OpenAI
+# from src.config.config import OPENAI_API_KEY 
+# class EmbeddingGeneratorOpenAI:
+#     ...

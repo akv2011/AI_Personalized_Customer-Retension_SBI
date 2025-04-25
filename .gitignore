@@ -1,23 +1,21 @@
-# Byte-compiled / optimized / DLL files
+
 __pycache__/
 *.py[cod]
 *$py.class
 
-# Virtual environment
+
 venv/
 *.env
 .env
 
-# Frontend dependencies (node_modules)
+
 frontend/node_modules/
 
-# Frontend build output
+
 frontend/build/
 
-# Data directories (if you don't want to track sample data in Git - adjust as needed)
 data/
 
-# OS generated files # OS generated files
 .DS_Store
 .DS_Store?
 ._*
@@ -26,7 +24,7 @@ data/
 ehthumbs.db
 Thumbs.db
 
-# Log and temp files
+
 *.log
 *.tmp
 temp/
@@ -36,7 +34,7 @@ tmp/
 *.pid
 *.lock
 
-# Packages
+
 *.egg
 *.egg-info
 dist
@@ -50,7 +48,7 @@ wheels
 *.dll
 *.exp
 
-# Editors and IDEs
+
 .idea/
 .vscode/
 *.suo
