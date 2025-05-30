@@ -3,7 +3,12 @@ import os
 from werkzeug.utils import secure_filename
 import google.generativeai as genai
 # --- Added imports for Google Search Grounding ---
-from google.generativeai.types import Tool, GenerateContentConfig, GoogleSearch
+# Remove the incorrect import line below
+# from google.generativeai.types import Tool, GenerateContentConfig, GoogleSearch 
+# Add the corrected import lines below
+# Remove GoogleSearch from this import
+from google.generativeai.types import Tool 
+from google.generativeai import GenerationConfig # Corrected import for GenerationConfig
 # --- End Added imports ---
 from src.personalization_engine.recommendation_engine import RecommendationEngine
 from flask_cors import CORS
@@ -121,10 +126,13 @@ def gemini_search_api():
 
         # 2. Configure Gemini model and Google Search tool
         # Use a model that supports grounding, like gemini-1.5-flash or gemini-pro
-        # Note: gemini-2.0-flash mentioned in docs might not be available via API yet, using 1.5 flash
-        model = genai.GenerativeModel('gemini-1.5-flash') 
-        google_search_tool = Tool(google_search=GoogleSearch())
-        tool_config = GenerateContentConfig(tools=[google_search_tool])
+        # --- Corrected model name ---
+        model = genai.GenerativeModel('gemini-1.5-flash-001') # Use a model known to support grounding well
+        # --- Define the Tool ---
+        google_search_tool = Tool(google_search_retrieval={})
+        # --- Remove incorrect GenerationConfig initialization for tools ---
+        # tool_config = GenerationConfig(tools=[google_search_tool]) 
+        # --- End Correction ---
 
         # 3. Create the prompt, instructing the model to use search if needed
         sbi_life_grounded_search_prompt = f"""You are an AI assistant for SBI Life Insurance. Your goal is to answer user queries accurately and helpfully, potentially aiding customer understanding and retention.
@@ -154,7 +162,9 @@ def gemini_search_api():
         logging.info("Calling Gemini API with search grounding enabled...")
         response = model.generate_content(
             sbi_life_grounded_search_prompt,
-            generation_config=tool_config # Pass the tool config here
+            # --- Pass tools directly to generate_content ---
+            tools=[google_search_tool] 
+            # generation_config=tool_config # Remove this line
         )
 
         # Log grounding metadata if available (optional)

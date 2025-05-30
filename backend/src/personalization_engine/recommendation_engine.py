@@ -12,6 +12,7 @@ import openai # Keep for now as chat completion uses it
 from collections import defaultdict # Import defaultdict for chat history
 import re # Import regex for parsing sentiment
 import time # Add time for unique IDs
+import httpx # Import httpx
 
 class RecommendationEngine:
     def __init__(self):
@@ -21,10 +22,29 @@ class RecommendationEngine:
         if not config.GOOGLE_API_KEY:
             raise ValueError("GOOGLE_API_KEY not set in config for EmbeddingGenerator.")
         # Keep OpenAI key check for Chat Completion part
+        self.openai_client = None # Initialize client attribute
         if not config.OPENAI_API_KEY:
             print("Warning: OPENAI_API_KEY not set in config. Chat completion might fail.")
         else:
-             openai.api_key = config.OPENAI_API_KEY
+            # Temporarily unset proxy environment variables
+            original_proxies = {
+                'http_proxy': os.environ.pop('HTTP_PROXY', None),
+                'https_proxy': os.environ.pop('HTTPS_PROXY', None),
+                'all_proxy': os.environ.pop('ALL_PROXY', None)
+            }
+            try:
+                # Simplify httpx.Client initialization
+                httpx_client = httpx.Client()
+                # Pass the custom httpx client to the OpenAI client
+                self.openai_client = openai.Client(
+                    api_key=config.OPENAI_API_KEY,
+                    http_client=httpx_client
+                )
+            finally:
+                # Restore original environment variables
+                for key, value in original_proxies.items():
+                    if value is not None:
+                        os.environ[key.upper()] = value
         # Load system prompt from file
         try:
             with open(config.SYSTEM_PROMPT_PATH, 'r') as f:
@@ -164,8 +184,12 @@ class RecommendationEngine:
         try:
             print("\n--- Calling OpenAI for RAG response --- ")
             print(f"Target Language: {user_language}")
-            # ... existing print statements ...
-            openai_response = openai.chat.completions.create(
+            # Check if the client was initialized
+            if not self.openai_client:
+                 raise ValueError("OpenAI client not initialized. Check API key.")
+            
+            # Use the explicitly created client instance
+            openai_response = self.openai_client.chat.completions.create(
                 model="gpt-4o",
                 messages=prompt_messages,
                 max_tokens=450 # Slightly more tokens for response + sentiment line
