@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40">
+  <g id="Group_9638" data-name="Group 9638" transform="translate(-3844.5 684)">
+    <g id="Group_9567" data-name="Group 9567" transform="translate(-216.5 -535)">
+      <rect id="Rectangle_2087" data-name="Rectangle 2087" width="40" height="40" transform="translate(4061 -149)" fill="#fff"/>
+      <g id="Group_9620" data-name="Group 9620" transform="translate(8.215 90.941)">
+        <g id="noun-text-spacing-3136761" transform="translate(4166.72 -212.141)">
+          <g id="Layer_30" data-name="Layer 30" transform="translate(1.994 2)">
+            <path id="Path_11872" data-name="Path 11872" d="M5.443,4.295H16.917V26.1a1.147,1.147,0,0,0,2.295,0V4.295H30.687a1.147,1.147,0,0,0,0-2.295H5.443a1.147,1.147,0,1,0,0,2.295Z" transform="translate(-113.994 -29)" fill="#301f6c"/>
+          </g>
+        </g>
+        <g id="Group_9619" data-name="Group 9619" transform="translate(0 1)">
+          <g id="Group_9617" data-name="Group 9617">
+            <line id="Line_263" data-name="Line 263" x2="5" y2="5" transform="translate(4082.071 -212.859)" fill="none" stroke="#d60d47" stroke-linecap="round" stroke-width="2"/>
+            <path id="Path_11873" data-name="Path 11873" d="M0,5,4.063.938,5,0" transform="translate(4082.071 -207.859)" fill="none" stroke="#d60d47" stroke-linecap="round" stroke-width="2"/>
+          </g>
+          <g id="Group_9618" data-name="Group 9618" transform="translate(8145.57 -415.718) rotate(180)">
+            <line id="Line_263-2" data-name="Line 263" x2="5" y2="5" transform="translate(4082.071 -212.859)" fill="none" stroke="#d60d47" stroke-linecap="round" stroke-width="2"/>
+            <path id="Path_11873-2" data-name="Path 11873" d="M0,5,4.063.938,5,0" transform="translate(4082.071 -207.859)" fill="none" stroke="#d60d47" stroke-linecap="round" stroke-width="2"/>
+          </g>
+          <line id="Line_264" data-name="Line 264" x2="26" transform="translate(4059.5 -207.859)" fill="none" stroke="#d60d47" stroke-linecap="round" stroke-width="2"/>
+        </g>
+      </g>
+    </g>
+  </g>
+</svg>

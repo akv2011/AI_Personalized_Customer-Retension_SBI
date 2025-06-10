@@ -52,6 +52,8 @@ const HomePage = () => {
   const [selectedLanguage, setSelectedLanguage] = useState('English');
   const [isJoinUsOpen, setIsJoinUsOpen] = useState(false);
   const [selectedService, setSelectedService] = useState(null);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
   const [hoveredNavItem, setHoveredNavItem] = useState(null);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [focusedNavItem, setFocusedNavItem] = useState(null);
@@ -109,9 +111,19 @@ const HomePage = () => {
       }
     };
 
+    const handleEscapeKey = (event) => {
+      if (event.key === 'Escape') {
+        setIsLanguageOpen(false);
+        setIsLoginOpen(false);
+        setIsMobileMenuOpen(false);
+      }
+    };
+
     document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener('keydown', handleEscapeKey);
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('keydown', handleEscapeKey);
     };
   }, []);
 
@@ -242,6 +254,26 @@ const HomePage = () => {
 
   const prevSlide = () => {
     setCurrentSlide((prev) => (prev - 1 + heroSlides.length) % heroSlides.length);
+  };
+
+  const handleSearch = (query) => {
+    const searchQuery = query.toLowerCase().trim();
+    if (searchQuery.includes('smart swadhan supreme')) {
+      setIsSearchModalOpen(true);
+    } else {
+      // For other searches, you could redirect to a general search page
+      console.log('Search for:', query);
+    }
+  };
+
+  const handleSearchSubmit = (e, isMobile = false) => {
+    e.preventDefault();
+    const inputId = isMobile ? 'mobile-search-input' : 'desktop-search-input';
+    const searchInput = document.getElementById(inputId);
+    if (searchInput && searchInput.value) {
+      handleSearch(searchInput.value);
+      searchInput.value = '';
+    }
   };
 
   const navigationItems = [
@@ -434,25 +466,33 @@ const HomePage = () => {
                   <ChevronDown className={`w-4 h-4 ml-1 transition-transform ${isLanguageOpen ? 'rotate-180' : ''}`} />
                 </button>
                 {isLanguageOpen && (
-                  <div className="absolute right-0 mt-2 w-56 bg-white border border-gray-200 rounded-md shadow-lg z-50">
-                    <div className="py-2">
-                      <div className="px-4 py-2 text-xs font-semibold text-gray-500 uppercase">Select Language</div>
-                      {languages.map((lang) => (
-                        <button
-                          key={lang.code}
-                          className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center"
-                          onClick={() => {
-                            setSelectedLanguage(lang.name);
-                            setIsLanguageOpen(false);
-                          }}
-                        >
-                          <span className="mr-2">{lang.flag}</span>
-                          <span>{lang.name}</span>
-                          {selectedLanguage === lang.name && (
-                            <span className="ml-auto text-blue-600">✓</span>
-                          )}
-                        </button>
-                      ))}
+                  <div className="fixed inset-0 z-[9999]">
+                    <div 
+                      className="absolute inset-0 bg-black bg-opacity-30"
+                      onClick={() => setIsLanguageOpen(false)}
+                    ></div>
+                    <div className="absolute top-20 right-4 w-64 bg-white rounded-lg shadow-2xl border z-[10000]">
+                      <div className="p-6">
+                        <h3 className="text-xl font-semibold text-gray-800 mb-6">Select Language</h3>
+                        <div className="space-y-3 max-h-80 overflow-y-auto">
+                          {languages.map((lang) => (
+                            <button
+                              key={lang.code}
+                              className="w-full text-left px-4 py-3 text-gray-700 hover:bg-blue-50 rounded-lg flex items-center transition-colors border border-transparent hover:border-blue-200"
+                              onClick={() => {
+                                setSelectedLanguage(lang.name);
+                                setIsLanguageOpen(false);
+                              }}
+                            >
+                              <span className="mr-3 text-xl">{lang.flag}</span>
+                              <span className="flex-1 font-medium">{lang.name}</span>
+                              {selectedLanguage === lang.name && (
+                                <span className="text-blue-600 font-bold text-lg">✓</span>
+                              )}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
                     </div>
                   </div>
                 )}
@@ -471,31 +511,40 @@ const HomePage = () => {
                   <ChevronDown className={`w-4 h-4 ml-1 transition-transform ${isLoginOpen ? 'rotate-180' : ''}`} />
                 </button>
                 {isLoginOpen && (
-                  <div className="absolute right-0 mt-2 w-72 bg-white border border-gray-200 rounded-md shadow-lg z-50">
-                    <div className="py-2">
-                      <div className="px-4 py-2 text-xs font-semibold text-gray-500 uppercase">Login Options</div>
-                      {loginOptions.map((option, index) => (
-                        <a
-                          key={index}
-                          href={option.url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="block px-4 py-3 text-sm text-gray-700 hover:bg-gray-100 border-b border-gray-100 last:border-b-0"
-                        >
-                          <div className="flex items-start">
-                            <option.icon className="w-5 h-5 text-blue-600 mr-3 mt-0.5" />
-                            <div>
-                              <div className="font-medium">{option.name}</div>
-                              <div className="text-xs text-gray-500 mt-1">{option.description}</div>
-                            </div>
-                            <ArrowRight className="w-4 h-4 text-gray-400 ml-auto mt-0.5" />
-                          </div>
-                        </a>
-                      ))}
-                      <div className="px-4 py-3 border-t border-gray-200">
-                        <p className="text-xs text-gray-500">
-                          Need help? <a href="#" className="text-blue-600 hover:underline">Contact Support</a>
-                        </p>
+                  <div className="fixed inset-0 z-[9999]">
+                    <div 
+                      className="absolute inset-0 bg-black bg-opacity-30"
+                      onClick={() => setIsLoginOpen(false)}
+                    ></div>
+                    <div className="absolute top-20 right-4 w-80 bg-white rounded-lg shadow-2xl border z-[10000]">
+                      <div className="p-6">
+                        <h3 className="text-xl font-semibold text-gray-800 mb-6">Login Options</h3>
+                        <div className="space-y-4">
+                          {loginOptions.map((option, index) => (
+                            <a
+                              key={index}
+                              href={option.url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="block p-4 rounded-lg border border-gray-200 hover:border-blue-300 hover:bg-blue-50 transition-all group hover:shadow-md"
+                              onClick={() => setIsLoginOpen(false)}
+                            >
+                              <div className="flex items-start">
+                                <option.icon className="w-6 h-6 text-blue-600 mr-4 mt-1 flex-shrink-0" />
+                                <div className="flex-1">
+                                  <div className="font-semibold text-gray-800 group-hover:text-blue-700 text-lg">{option.name}</div>
+                                  <div className="text-sm text-gray-600 mt-1 leading-relaxed">{option.description}</div>
+                                </div>
+                                <ArrowRight className="w-5 h-5 text-gray-400 group-hover:text-blue-600 mt-1" />
+                              </div>
+                            </a>
+                          ))}
+                        </div>
+                        <div className="mt-6 pt-4 border-t border-gray-200">
+                          <p className="text-xs text-gray-500 text-center">
+                            Need help? <a href="#" className="text-blue-600 hover:underline font-medium">Contact Support</a>
+                          </p>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -505,142 +554,198 @@ const HomePage = () => {
           </div>
 
           {/* Main Navigation */}
-          <nav className="py-0" ref={navRef}>
-            <div className="flex justify-between items-center">
+          <nav className="py-2 relative">
+            <div className="flex justify-between items-center w-full">
               {/* Mobile Menu Button */}
               <button
-                className="lg:hidden p-2 text-gray-600"
+                className="lg:hidden p-2 text-gray-600 relative z-10"
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
                 aria-label="Toggle navigation menu"
                 aria-expanded={isMobileMenuOpen}
               >
                 {isMobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
               </button>
-
-              {/* Desktop Navigation */}
-              <div className="hidden lg:flex relative">
-                {navigationItems.map((item, index) => (
-                  <div
-                    key={item.name}
-                    className="group"
-                    onMouseEnter={() => !focusedNavItem && setHoveredNavItem(item.name)}
-                    onMouseLeave={() => !focusedNavItem && setHoveredNavItem(null)}
-                    onKeyDown={(e) => handleKeyDown(e, item)}
-                  >
-                    <div
-                      className={`${item.bgColor} text-white px-6 py-4 text-center group-hover:opacity-100 transition-all duration-200 relative`}
-                      style={{ 
-                        clipPath: index === navigationItems.length - 1 ? 'none' : 'polygon(0 0, calc(100% - 20px) 0, 100% 50%, calc(100% - 20px) 100%, 0 100%)'
-                      }}
-                    >
-                      <button
-                        id={`navitem-${item.name}`}
-                        className="block w-full text-left relative focus:outline-none focus:ring-2 focus:ring-white focus:ring-opacity-50"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          setHoveredNavItem(hoveredNavItem === item.name ? null : item.name);
-                        }}
-                        onKeyDown={(e) => handleKeyDown(e, item)}
-                        aria-expanded={hoveredNavItem === item.name}
-                        aria-haspopup="true"
-                        aria-controls={`dropdown-${item.name}`}
-                      >
-                        <div className="font-bold text-sm group-hover:transform group-hover:translate-y-[-2px] transition-transform">
-                          {item.name}
-                          <div className="absolute bottom-[-2px] left-1/2 transform -translate-x-1/2 w-0 h-0.5 bg-white group-hover:w-full transition-all duration-200"></div>
-                        </div>
-                        <div className="text-xs opacity-90">{item.subtitle}</div>
-                      </button>
-                    </div>
-                    
-                    {/* Dropdown Menu */}
-                    <div 
-                      className={`absolute left-0 w-full bg-white shadow-xl rounded-b-lg overflow-hidden z-50 border-t-2 transition-all duration-300 transform origin-top
-                        ${hoveredNavItem === item.name 
-                          ? 'opacity-100 translate-y-0 visible' 
-                          : 'opacity-0 -translate-y-4 invisible'}`}
-                      style={{
-                        borderTopColor: hoveredNavItem === item.name 
-                          ? getDropdownColor(item.bgColor) 
-                          : 'transparent',
-                        minWidth: '300px',
-                        maxWidth: '400px'
-                      }}
-                      role="menu"
-                      aria-orientation="vertical"
-                      aria-labelledby={`navitem-${item.name}`}
-                      data-dropdown={item.name}
-                    >
-                      <div className="p-6">
-                        <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center">
-                          {item.name}
-                          <div className="h-px flex-1 bg-gray-200 ml-4"></div>
-                        </h3>
-                        <div className="grid gap-2">
-                          {item.dropdownItems.map((dropdownItem, idx) => (
-                            <a
-                              key={idx}
-                              href={dropdownItem.href}
-                              className="flex items-start p-3 hover:bg-gray-50 rounded-lg group transition-all duration-200"
-                            >
-                              <div className="relative pl-6">
-                                <div className="absolute left-0 top-[10px] w-2 h-2 rounded-full bg-gray-300 group-hover:bg-blue-500 transition-colors"></div>
-                                <div>
-                                  <div className="font-medium text-gray-900 group-hover:text-blue-600 transition-colors">
-                                    {dropdownItem.title}
-                                  </div>
-                                  <p className="text-sm text-gray-500 mt-0.5 group-hover:text-gray-600 transition-colors">
-                                    {dropdownItem.description}
-                                  </p>
-                                </div>
-                              </div>
-                              <div className="ml-auto pl-4">
-                                <ArrowRight className="w-5 h-5 text-gray-400 group-hover:text-blue-600 transform group-hover:translate-x-1 transition-all" />
-                              </div>
-                            </a>
+            </div>
+            
+            {/* Full-width Desktop Navigation */}
+            <div className="hidden lg:block navbar-full-wrapper">
+              <div className="navbar-container">
+                {/* Left side: Navigation tabs */}
+                <div className="nav-tabs-container">
+                  {/* LEARN tab with dropdown */}
+                  <div className="nav-dropdown-group">
+                    <button className="nav-tab-btn">
+                      LEARN
+                    </button>
+                    <div className="nav-dropdown">
+                      <div className="dropdown-container">
+                        <div className="dropdown-submenu">
+                          {['Life Insurance Basics', 'Investment Planning', 'Tax Benefits', 'Financial Literacy'].map((item, index) => (
+                            <button key={item} className="dropdown-submenu-item">
+                              {item}
+                            </button>
                           ))}
                         </div>
                       </div>
-                      <div className="bg-gray-50 px-6 py-4 border-t border-gray-100">
-                        <a 
-                          href={item.href} 
-                          className="text-sm text-blue-600 hover:text-blue-700 font-medium flex items-center justify-between group"
-                        >
-                          <span className="flex items-center">
-                            View All {item.name} Resources
-                            <ArrowRight className="w-4 h-4 ml-1 transform group-hover:translate-x-1 transition-transform" />
-                          </span>
-                          <span className="text-gray-400 text-xs">{item.dropdownItems.length} items</span>
-                        </a>
+                    </div>
+                  </div>
+
+                  {/* PRODUCTS tab with dropdown */}
+                  <div className="nav-dropdown-group">
+                    <button className="nav-tab-btn">
+                      PRODUCTS
+                    </button>
+                    <div className="nav-dropdown">
+                      <div className="dropdown-container">
+                        <div className="dropdown-submenu">
+                          {['Term Plans', 'ULIP', 'Savings Plans', 'Retirement Plans', 'Child Plans'].map((item, index) => (
+                            <button key={item} className="dropdown-submenu-item">
+                              {item}
+                            </button>
+                          ))}
+                        </div>
                       </div>
                     </div>
                   </div>
-                ))}
-              </div>
-              <div className="flex items-center space-x-4">
-                <button className="bg-yellow-400 text-black px-6 py-3 rounded-lg font-bold text-sm flex items-center hover:bg-yellow-300 transition-colors">
-                  <Globe className="w-4 h-4 mr-2" />
-                  Online Plans
-                </button>
-                <div className="relative">
-                  <input
-                    type="text"
-                    placeholder="Search..."
-                    className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  />
-                  <Search className="absolute left-3 top-2.5 w-4 h-4 text-gray-400" />
+                  
+                  {/* SERVICES tab with dropdown */}
+                  <div className="nav-dropdown-group">
+                    <button className="nav-tab-btn">
+                      SERVICES
+                    </button>
+                    <div className="nav-dropdown">
+                      <div className="dropdown-container">
+                        <div className="dropdown-submenu">
+                          {['Services', 'Claims and Maturity', 'NRI Corner', 'Download Centre', 'NAV & Fund Performance', 'FAQs'].map((item, index) => (
+                            <button key={item} className="dropdown-submenu-item">
+                              {item}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* ABOUT tab with dropdown */}
+                  <div className="nav-dropdown-group">
+                    <button className="nav-tab-btn">
+                      ABOUT
+                    </button>
+                    <div className="nav-dropdown">
+                      <div className="dropdown-container">
+                        <div className="dropdown-submenu">
+                          {['Our Company', 'Leadership', 'Awards', 'CSR', 'Careers'].map((item, index) => (
+                            <button key={item} className="dropdown-submenu-item">
+                              {item}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* CONTACT US tab with dropdown */}
+                  <div className="nav-dropdown-group">
+                    <button className="nav-tab-btn">
+                      CONTACT US
+                    </button>
+                    <div className="nav-dropdown">
+                      <div className="dropdown-container">
+                        <div className="dropdown-submenu">
+                          {['Branch Locator', 'Customer Care', 'Grievance', 'Feedback', 'Agent Login'].map((item, index) => (
+                            <button key={item} className="dropdown-submenu-item">
+                              {item}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
-                <button 
-                  className="lg:hidden p-2"
-                  onClick={() => setIsMenuOpen(!isMenuOpen)}
-                >
-                  <Menu className="w-6 h-6" />
-                </button>
+                
+                {/* Right side: Online Plans button and Search */}
+                <div className="navbar-right-actions">
+                  <button className="online-plans-btn">
+                    🌐 Online Plans
+                  </button>
+                  <div className="search-container">
+                    <form onSubmit={handleSearchSubmit}>
+                      <input
+                        id="desktop-search-input"
+                        type="text"
+                        placeholder="Search..."
+                        className="search-input"
+                      />
+                      <Search className="search-icon" />
+                    </form>
+                  </div>
+                </div>
               </div>
+            </div>
+
+            {/* Mobile Navigation */}
+            <div className="lg:hidden navbar-mobile-wrapper">
+              <div className="navbar-mobile-container">
+                {/* Mobile Menu Button */}
+                <button
+                  className="mobile-menu-btn"
+                  onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                  aria-label="Toggle navigation menu"
+                >
+                  {isMobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+                </button>
+                
+                {/* Mobile Online Plans and Search */}
+                <div className="mobile-navbar-actions">
+                  <button className="mobile-online-plans-btn">
+                    🌐 Plans
+                  </button>
+                  <div className="mobile-search-container">
+                    <Search 
+                      className="mobile-search-icon" 
+                      onClick={() => {
+                        const searchContainer = document.querySelector('.mobile-search-full');
+                        const searchInput = document.getElementById('mobile-search-input');
+                        if (searchContainer) {
+                          searchContainer.style.display = searchContainer.style.display === 'none' ? 'block' : 'none';
+                          if (searchInput && searchContainer.style.display === 'block') {
+                            searchInput.focus();
+                          }
+                        }
+                      }}
+                    />
+                  </div>
+                </div>
+              </div>
+              
+              {/* Mobile Menu Dropdown */}
+              {isMobileMenuOpen && (
+                <div className="mobile-menu-dropdown">
+                  <div className="mobile-menu-items">
+                    {['LEARN', 'PRODUCTS', 'SERVICES', 'ABOUT', 'CONTACT-US'].map((tab, index) => (
+                      <button key={tab} className="mobile-menu-item">
+                        {tab}
+                      </button>
+                    ))}
+                    <div className="mobile-search-full">
+                      <form onSubmit={(e) => handleSearchSubmit(e, true)}>
+                        <input
+                          id="mobile-search-input"
+                          type="text"
+                          placeholder="Search..."
+                          className="mobile-search-input"
+                        />
+                      </form>
+                    </div>
+                  </div>
+                </div>
+              )}
+              
             </div>
           </nav>
 
-          {/* Secondary Navigation */}
+          {/* Secondary Navigation - COMMENTED OUT TO AVOID DUPLICATE BAR */}
+          {/* 
           <div className="bg-purple-900 -mx-4 px-4 sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8">
             <div className="flex justify-center space-x-8 py-3 overflow-x-auto">
               {secondaryNavItems.map((item) => (
@@ -654,6 +759,7 @@ const HomePage = () => {
               ))}
             </div>
           </div>
+          */}
         </div>
       </header>
 
@@ -1329,6 +1435,158 @@ const HomePage = () => {
             </button>
             <div className="flex-1 overflow-hidden">
               <ChatInterface />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Smart Swadhan Supreme Search Result Modal */}
+      {isSearchModalOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="p-6 border-b border-gray-200 flex justify-between items-center">
+              <h2 className="text-3xl font-bold text-gray-900">SBI Life - Smart Swadhan Supreme</h2>
+              <button
+                onClick={() => setIsSearchModalOpen(false)}
+                className="text-gray-400 hover:text-gray-600"
+              >
+                <X className="w-6 h-6" />
+              </button>
+            </div>
+            <div className="p-6">
+              {/* Product Header */}
+              <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg p-6 mb-6">
+                <div className="flex items-start space-x-4">
+                  <div className="w-16 h-16 bg-blue-100 rounded-lg flex items-center justify-center">
+                    <Shield className="w-8 h-8 text-blue-600" />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="text-2xl font-bold text-gray-900 mb-2">SBI Life - Smart Swadhan Supreme</h3>
+                    <p className="text-sm text-gray-600 mb-2">UIN: 111N140V02</p>
+                    <p className="text-sm text-gray-500">Individual, Non-Linked, Non-Participating, Life Insurance Savings Product</p>
+                    <div className="flex items-center mt-3 space-x-6">
+                      <div className="flex items-center">
+                        <Star className="w-4 h-4 text-yellow-400 fill-current" />
+                        <span className="text-sm text-gray-600 ml-1">Guaranteed Returns</span>
+                      </div>
+                      <div className="flex items-center">
+                        <Gift className="w-4 h-4 text-green-600" />
+                        <span className="text-sm text-gray-600 ml-1">Tax Benefits</span>
+                      </div>
+                      <div className="flex items-center">
+                        <Heart className="w-4 h-4 text-red-600" />
+                        <span className="text-sm text-gray-600 ml-1">Life Protection</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <button className="bg-blue-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-blue-700 transition-colors mb-2 block">
+                      Know More
+                    </button>
+                    <button className="bg-green-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-green-700 transition-colors block">
+                      Buy Online
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {/* Product Details */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                <div>
+                  <h4 className="text-xl font-semibold text-gray-800 mb-4">Key Features</h4>
+                  <ul className="space-y-3">
+                    <li className="flex items-start">
+                      <div className="w-2 h-2 bg-blue-500 rounded-full mr-3 mt-2"></div>
+                      <span className="text-gray-700">Guaranteed return of 100% of the total premiums paid on maturity</span>
+                    </li>
+                    <li className="flex items-start">
+                      <div className="w-2 h-2 bg-blue-500 rounded-full mr-3 mt-2"></div>
+                      <span className="text-gray-700">Life insurance protection throughout the policy term</span>
+                    </li>
+                    <li className="flex items-start">
+                      <div className="w-2 h-2 bg-blue-500 rounded-full mr-3 mt-2"></div>
+                      <span className="text-gray-700">Flexible premium payment options</span>
+                    </li>
+                    <li className="flex items-start">
+                      <div className="w-2 h-2 bg-blue-500 rounded-full mr-3 mt-2"></div>
+                      <span className="text-gray-700">Tax benefits under Section 80C and 10(10D)</span>
+                    </li>
+                    <li className="flex items-start">
+                      <div className="w-2 h-2 bg-blue-500 rounded-full mr-3 mt-2"></div>
+                      <span className="text-gray-700">Optional riders for enhanced protection</span>
+                    </li>
+                  </ul>
+                </div>
+                <div>
+                  <h4 className="text-xl font-semibold text-gray-800 mb-4">Eligibility</h4>
+                  <div className="space-y-3">
+                    <div className="bg-gray-50 p-4 rounded-lg">
+                      <h5 className="font-semibold text-gray-700 mb-2">Entry Age</h5>
+                      <p className="text-gray-600">18 years to 60 years (age last birthday)</p>
+                    </div>
+                    <div className="bg-gray-50 p-4 rounded-lg">
+                      <h5 className="font-semibold text-gray-700 mb-2">Policy Term</h5>
+                      <p className="text-gray-600">10 years to 30 years</p>
+                    </div>
+                    <div className="bg-gray-50 p-4 rounded-lg">
+                      <h5 className="font-semibold text-gray-700 mb-2">Premium Payment</h5>
+                      <p className="text-gray-600">Regular Pay / Limited Pay options</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Benefits Section */}
+              <div className="mb-6">
+                <h4 className="text-xl font-semibold text-gray-800 mb-4">Benefits</h4>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="border border-gray-200 rounded-lg p-4">
+                    <h5 className="font-semibold text-blue-600 mb-2">Death Benefit</h5>
+                    <p className="text-gray-600 text-sm">Highest of Basic Sum Assured, 11 times Annualized Premium, or 105% of Total Premiums Paid</p>
+                  </div>
+                  <div className="border border-gray-200 rounded-lg p-4">
+                    <h5 className="font-semibold text-green-600 mb-2">Maturity Benefit</h5>
+                    <p className="text-gray-600 text-sm">100% return of total premiums paid during the policy term</p>
+                  </div>
+                  <div className="border border-gray-200 rounded-lg p-4">
+                    <h5 className="font-semibold text-purple-600 mb-2">Surrender Value</h5>
+                    <p className="text-gray-600 text-sm">Guaranteed Surrender Value available after paying premiums for 2 full years</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Available Riders */}
+              <div className="mb-6">
+                <h4 className="text-xl font-semibold text-gray-800 mb-4">Optional Riders</h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="bg-blue-50 p-4 rounded-lg">
+                    <h5 className="font-semibold text-blue-700 mb-2">Accident Benefit Rider</h5>
+                    <p className="text-gray-600 text-sm">Additional protection in case of accidental death or disability</p>
+                  </div>
+                  <div className="bg-green-50 p-4 rounded-lg">
+                    <h5 className="font-semibold text-green-700 mb-2">Critical Illness Rider</h5>
+                    <p className="text-gray-600 text-sm">Coverage for specified critical illnesses</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Call to Actions */}
+              <div className="border-t border-gray-200 pt-6">
+                <div className="flex flex-col sm:flex-row justify-center space-y-3 sm:space-y-0 sm:space-x-4">
+                  <button className="bg-blue-600 text-white px-8 py-3 rounded-lg font-bold hover:bg-blue-700 transition-colors">
+                    Get Quote
+                  </button>
+                  <button className="bg-green-600 text-white px-8 py-3 rounded-lg font-bold hover:bg-green-700 transition-colors">
+                    Buy Online
+                  </button>
+                  <button className="border border-gray-300 text-gray-700 px-8 py-3 rounded-lg font-bold hover:bg-gray-50 transition-colors">
+                    Download Brochure
+                  </button>
+                </div>
+                <p className="text-center text-xs text-gray-500 mt-4">
+                  *Terms and conditions apply. Please read the policy document carefully before purchasing.
+                </p>
+              </div>
             </div>
           </div>
         </div>

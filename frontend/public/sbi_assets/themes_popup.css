@@ -1,0 +1,430 @@
+#allincall-popup {
+    cursor: pointer;
+    z-index: 2147483647;
+}
+
+#allincall-popup-wrapper {
+    position: fixed;
+    width: max-content;
+    height: max-content;
+    z-index: 2147483647;
+    transition: all 0.1s ease !important;
+    display: flex;
+}
+
+#allincall-popup-wrapper.bottom-right-position-wrapper {
+    right: 20px;
+    bottom: 30px !important;
+    align-items: flex-end;
+    flex-direction: column;
+}
+
+#allincall-popup-wrapper.top-right-position-wrapper {
+    right: 20px;
+    top: 1em !important;
+    align-items: flex-end;
+    flex-direction: column-reverse;
+}
+
+#allincall-popup-wrapper.top-left-position-wrapper {
+    left: 20px;
+    top: 1em !important;
+    align-items: flex-start;
+    flex-direction: column-reverse;
+}
+
+#allincall-popup-wrapper.bottom-left-position-wrapper {
+    left: 20px;
+    bottom: 1.6em !important;
+    align-items: flex-start;
+    flex-direction: column;
+}
+
+#allincall-popup-wrapper .allincall-popup-image-icon-wrapper img {
+    max-width: 128px;
+    max-height: 128px;
+    position: unset !important;
+}
+
+.allincall-popup-image-icon-wrapper {
+    width: max-content;
+    height: max-content;
+    position: relative;
+}
+
+
+/* intent bubble css */
+
+#allincall-popup-wrapper.bottom-right-position-wrapper .notification-message-hide-div,
+#allincall-popup-wrapper.top-right-position-wrapper .notification-message-hide-div {
+    justify-content: flex-start;
+    position: absolute;
+    top: -10px;
+    left: -10px;
+}
+
+#allincall-popup-wrapper.bottom-left-position-wrapper .notification-message-hide-div,
+#allincall-popup-wrapper.top-left-position-wrapper .notification-message-hide-div {
+    justify-content: flex-end;
+    position: absolute;
+    right: -10px;
+    top: -10px;
+}
+
+.notification-message-hide-div {
+    display: flex;
+    margin-bottom: 5px;
+}
+
+.notification-message-hide-div svg{
+    cursor: pointer;
+}
+
+#allincall-popup-wrapper.bottom-right-position-wrapper .notification-message-intent-bubble {
+    border-bottom-right-radius: 2px;
+}
+
+#allincall-popup-wrapper.bottom-left-position-wrapper .notification-message-intent-bubble {
+    border-bottom-left-radius: 2px;
+}
+
+#allincall-popup-wrapper.top-right-position-wrapper .notification-message-intent-bubble {
+    border-top-right-radius: 2px;
+}
+
+#allincall-popup-wrapper.top-left-position-wrapper .notification-message-intent-bubble {
+    border-top-left-radius: 2px;
+}
+
+.notification-message-intent-bubble {
+    padding: 10px 10px 10px 15px;
+    border-radius: 10px;
+    background-color: #fff;
+    font-weight: normal;
+    font-size: 15px;
+    color: #4D4D4D;
+    display: block;
+    cursor: pointer;
+    max-width: 305px;
+    width: max-content;
+    margin-bottom: 4px;
+    min-height: 1.5em;
+}
+
+.notification-intent-message-bubble {
+    max-width: 305px;
+    cursor: pointer;
+}
+
+#allincall-popup-wrapper.top-right-position-wrapper .notification-intent-message-bubble-container,
+#allincall-popup-wrapper.bottom-right-position-wrapper .notification-intent-message-bubble-container {
+    direction: rtl;
+}
+
+#allincall-popup-wrapper.top-left-position-wrapper .notification-intent-message-bubble-container,
+#allincall-popup-wrapper.bottom-left-position-wrapper .notification-intent-message-bubble-container {
+    direction: ltr;
+}
+
+
+/* new message */
+
+#allincall-popup-wrapper.bottom-right-position-wrapper .new-notification-div,
+#allincall-popup-wrapper.bottom-left-position-wrapper .new-notification-div {
+    top: -40px;
+    right: 0px;
+}
+
+#allincall-popup-wrapper.top-right-position-wrapper .new-notification-div,
+#allincall-popup-wrapper.top-left-position-wrapper .new-notification-div {
+    top: -10px;
+    right: -18px;
+}
+
+#allincall-popup-wrapper.top-left-position-wrapper .new-notification-div {
+    transform: rotate(90deg) scaleY(1.3) !important;
+    width:  39px !important;
+    height: 45px !important;
+}
+
+#allincall-popup-wrapper.top-right-position-wrapper .new-notification-div {
+    transform: rotate(180deg) scaleY(1) !important;
+}
+
+#allincall-popup-wrapper.top-left-position-wrapper #new-notification-count {
+   transform: rotate(-90deg) translateX(-50px) !important;
+}
+
+#allincall-popup-wrapper.top-right-position-wrapper #new-notification-count {
+    transform: rotate(-180deg) translateY(-50px) translateX(-52px) !important;
+}
+
+.new-notification-div {
+    z-index: 2147483647;
+    position: absolute;
+    width: 43px;
+    height: 45px;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+
+/* greeting bubble css */
+
+#allincall-popup-wrapper.bottom-right-position-wrapper .greeting-bubble-notofication-wrapper .notification-message-hide-div,
+#allincall-popup-wrapper.top-right-position-wrapper .greeting-bubble-notofication-wrapper .notification-message-hide-div {
+    justify-content: flex-start;
+    position: absolute;
+    top: -15px;
+    left: -10px;
+}
+#allincall-popup-wrapper.bottom-left-position-wrapper .greeting-bubble-notofication-wrapper .notification-message-hide-div,
+#allincall-popup-wrapper.top-left-position-wrapper .greeting-bubble-notofication-wrapper .notification-message-hide-div {
+    justify-content: flex-end;
+    position: absolute;
+    right: -10px;
+    top: -10px;
+}
+
+#allincall-popup-wrapper .greeting-bubble-notofication-wrapper .notification-message-hide-div {
+    display: flex;
+    margin: 5px 0px;
+}
+
+#allincall-popup-wrapper.bottom-right-position-wrapper .greeting-bubble-notofication-wrapper {
+    position: fixed;
+    bottom: 156px;
+    right: 140px;
+}
+
+#allincall-popup-wrapper.bottom-left-position-wrapper .greeting-bubble-notofication-wrapper {
+    position: fixed;
+    bottom: 156px;
+    left: 140px;
+}
+
+#allincall-popup-wrapper.top-left-position-wrapper .greeting-bubble-notofication-wrapper {
+    position: fixed;
+    top: 147px;
+    left: 150px;
+}
+
+#allincall-popup-wrapper.top-right-position-wrapper .greeting-bubble-notofication-wrapper {
+    position: fixed;
+    top: 147px;
+    right: 150px;
+}
+
+#allincall-popup-wrapper .greeting-bubble-notofication-wrapper .notification-message-div {
+    display: flex;
+    flex-direction: column;
+}
+
+#allincall-popup-wrapper.top-right-position-wrapper .greeting-bubble-notofication-wrapper .notification-message-div,
+#allincall-popup-wrapper.top-left-position-wrapper .greeting-bubble-notofication-wrapper .notification-message-div {
+    flex-direction: column-reverse;
+}
+
+@media screen and (max-width: 428px) {
+    #allincall-popup-wrapper .greeting-bubble-notofication-wrapper .allincall-notification-message {
+        max-width: 180px !important;
+        max-height: 250px;
+        overflow-y: scroll;
+    }
+}
+
+#allincall-popup-wrapper #allincall-notification-count {
+    z-index: 2147483647;
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    background: #FD0000;
+    border: 1px solid #FFFFFF;
+    box-sizing: border-box;
+    box-shadow: 0px 4px 4px rgb(196 196 196 / 25%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: #fff;
+    font-size: 10px;
+}
+
+#allincall-popup-wrapper.bottom-right-position-wrapper #allincall-notification-count {
+    right: 16px;
+    top: -18px;
+}
+
+#allincall-popup-wrapper.top-right-position-wrapper #allincall-notification-count {
+    right: 16px;
+    bottom: -16px;
+}
+
+#allincall-popup-wrapper.bottom-left-position-wrapper #allincall-notification-count {
+    left: 4px;
+    top: -16px;
+}
+
+#allincall-popup-wrapper.top-left-position-wrapper #allincall-notification-count {
+    left: 4px;
+    bottom: -16px;
+}
+
+#allincall-popup-wrapper .greeting-bubble-notofication-wrapper .allincall-notification-message {
+    padding: 6px 12px 6px 12px;
+    border-radius: 10px;
+    background-color: #fff;
+    font-weight: normal;
+    font-size: 15px;
+    color: #4D4D4D;
+    display: block;
+    cursor: default;
+    max-width: 305px;
+    cursor: pointer;
+}
+
+#allincall-popup-wrapper.bottom-right-position-wrapper .greeting-bubble-notofication-wrapper .allincall-notification-message {
+    border-bottom-right-radius: 2px;
+}
+
+#allincall-popup-wrapper.bottom-left-position-wrapper .greeting-bubble-notofication-wrapper .allincall-notification-message {
+    border-bottom-left-radius: 2px;
+}
+
+#allincall-popup-wrapper.top-right-position-wrapper .greeting-bubble-notofication-wrapper .allincall-notification-message {
+    border-top-right-radius: 2px;
+}
+
+#allincall-popup-wrapper.top-left-position-wrapper .greeting-bubble-notofication-wrapper .allincall-notification-message {
+    border-top-left-radius: 2px;
+}
+
+/* minimize icon css */
+
+#allincall-minimize-popup {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 22px !important;
+    width: 22px !important;
+    position: absolute;
+    border-radius: 1em;
+    padding: 0px;
+    color: black;
+    cursor: pointer;
+    z-index: 2147483660;
+    text-align: center;
+    font-size: 0.9em;
+    background: #EBEBEB;
+}
+
+#allincall-popup-wrapper.bottom-right-position-wrapper #allincall-minimize-popup,
+#allincall-popup-wrapper.top-right-position-wrapper #allincall-minimize-popup {
+    left: -12px !important;
+    top: 18px;
+}
+
+#allincall-popup-wrapper.bottom-left-position-wrapper #allincall-minimize-popup,
+#allincall-popup-wrapper.top-left-position-wrapper #allincall-minimize-popup {
+    right: -15px !important;
+    top: 18px;
+    left: unset !important
+}
+
+#allincall-popup-wrapper.bottom-right-position-wrapper #allincall-minimize-popup-tooltip,
+#allincall-popup-wrapper.top-right-position-wrapper #allincall-minimize-popup-tooltip {
+    top: 0px !important;
+    right: 35px !important;
+}
+
+#allincall-popup-wrapper.bottom-left-position-wrapper #allincall-minimize-popup-tooltip,
+#allincall-popup-wrapper.top-left-position-wrapper #allincall-minimize-popup-tooltip {
+    top: 0px !important;
+    left: 35px !important;
+}
+
+#allincall-minimize-popup-tooltip {
+    position: absolute;
+    z-index: 100;
+    visibility: hidden;
+    font-weight: normal;
+    font-size: 12px;
+    line-height: 14px;
+    color: #FFFFFF;
+    z-index: 2147483670;
+    text-align: center;
+    padding: 0px 12px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: max-content;
+    height: 26px;
+    background: rgba(47, 128, 237, 0.75);
+    border-radius: 2px;
+}
+
+#allincall-minimize-popup:hover #allincall-minimize-popup-tooltip {
+    visibility: visible;
+}
+
+#allincall-minimize-popup:hover {
+    visibility: visible;
+    background-color: rgb(26, 161, 53);
+}
+
+
+
+/* Maximize icon css */
+
+
+#allincall-popup-wrapper.bottom-right-position-wrapper #allincall-maximize-popup-tooltip,
+#allincall-popup-wrapper.top-right-position-wrapper #allincall-maximize-popup-tooltip {
+    top: 0px !important;
+    right: 25px !important;
+}
+
+#allincall-popup-wrapper.bottom-left-position-wrapper #allincall-maximize-popup-tooltip,
+#allincall-popup-wrapper.top-left-position-wrapper #allincall-maximize-popup-tooltip {
+    top: 0px !important;
+    left: 25px !important;
+}
+
+#allincall-maximize-popup-tooltip {
+    position: absolute;
+    z-index: 100;
+    visibility: hidden;
+    color: #fff;
+    z-index: 2147483670;
+    text-align: center;
+    width: max-content;
+    height:  24px !important;
+}
+
+#allincall-maximize-popup:hover #allincall-maximize-popup-tooltip {
+    visibility: visible;
+}
+
+#allincall-maximize-popup:hover {
+    visibility: visible;
+    background-color: rgb(26, 161, 53);
+}
+
+.form-assist-intent-bubble {
+    word-break: break-word;
+}
+.intent-bubble-wrapper-div{
+    position: relative;
+    width: max-content;
+}
+#allincall-popup-wrapper.bottom-right-position-wrapper .notification-message-div-intent-bubble,
+#allincall-popup-wrapper.top-right-position-wrapper .notification-message-div-intent-bubble{
+    direction: rtl;
+}
+#allincall-popup-wrapper.bottom-right-position-wrapper .intent-bubble-wrapper-div,
+#allincall-popup-wrapper.top-right-position-wrapper .intent-bubble-wrapper-div{
+    direction: ltr;
+}

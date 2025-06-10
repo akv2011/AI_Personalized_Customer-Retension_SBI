@@ -1,0 +1,232 @@
+#allincall-chat-box {
+    display: block;
+    position: fixed;
+    bottom: 5px;
+    right: 20px;
+    width: 450px;
+    height: 600px;
+    max-height: 100%;
+    box-shadow: 5px 5px 5px 5px grey;
+    border-radius: 0.8em;
+    /*border:0.08em solid grey;*/
+    background-color: white;
+    z-index:2147483646;
+    /*transition: all 0.4s ease-in-out;*/
+}
+
+@media screen and (max-width: 425px) {
+    #allincall-chat-box {
+        width: 100%;
+        height: 100%;
+        bottom:0;
+        right:0;
+    }
+}
+
+.easychat-slideshow-slides {display: none}
+
+.easychat-slideshow-slides > img {
+  vertical-align: middle;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  width: 30em;
+  height: 25em;
+}
+
+/* Slideshow container */
+.easychat-slideshow-container {
+  max-width: 100%;
+  position: relative;
+  margin: auto;
+}
+
+/* Next & previous buttons */
+.easychat-slideshow-prev, .easychat-slideshow-next {
+  cursor: pointer;
+  position: absolute;
+  top: 80%;
+  width: auto;
+  padding: 16px;
+  margin-top: -22px;
+  color: white;
+  font-weight: bold;
+  font-size: 10px;
+  transition: 0.6s ease;
+  border-radius: 0 3px 3px 0;
+  user-select: none;
+  background-color: #6C2D77;
+}
+
+/* Position the "next button" to the right */
+.easychat-slideshow-next {
+  right: 0;
+  border-radius: 3px 0 0 3px;
+}
+
+/* On hover, add a black background color with a little bit see-through */
+.easychat-slideshow-prev:hover, .easychat-slideshow-next:hover {
+  background-color: rgba(0,0,0,0.8);
+}
+
+/* Number text (1/3 etc) */
+.easychat-slideshow-numbertext {
+  color: #6C2D77;
+  font-size: 12px;
+  padding: 8px 12px;
+  position: absolute;
+  top: 0;
+}
+
+/* The dots/bullets/indicators */
+.easychat-slideshow-dot {
+  cursor: pointer;
+  height: 15px;
+  width: 15px;
+  margin: 0 2px;
+  background-color: #bbb;
+  border-radius: 50%;
+  display: inline-block;
+  transition: background-color 0.6s ease;
+}
+
+/*.active, .easychat-slideshow-dot:hover {
+  background-color: #717171;
+}
+*/
+.easychat-slideshow-dot-cards {
+  cursor: pointer;
+  height: 15px;
+  width: 15px;
+  margin: 0 2px;
+  background-color: #bbb;
+  border-radius: 50%;
+  display: inline-block;
+  transition: background-color 0.6s ease;
+}
+
+.easychat-slideshow-dot-cards:hover {
+  background-color: #717171;
+}
+
+/* Fading animation */
+/*.fade {
+  -webkit-animation-name: fade;
+  -webkit-animation-duration: 1.5s;
+  animation-name: fade;
+  animation-duration: 1.5s;
+}
+*/
+/*@-webkit-keyframes fade {
+  from {opacity: .4} 
+  to {opacity: 1}
+}
+
+@keyframes fade {
+  from {opacity: .4} 
+  to {opacity: 1}
+}
+*/
+/* On smaller screens, decrease text size */
+@media only screen and (max-width: 300px) {
+  .easychat-slideshow-prev, .easychat-slideshow-next,.text {font-size: 11px}
+}
+
+#allincall-maximize-popup {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: fixed;
+    bottom: 110px;
+    right: 65px ;
+    border-radius: 1em;
+    padding: 0px;
+    height: 14px;
+    width: 14px;
+    color: black;
+    cursor: pointer;
+    z-index: 2147483660;
+    text-align: center;
+    display: none;
+    font-size: 0.7em;
+    background: #EBEBEB;
+}
+
+#allincall-minimize-popup:hover{
+  background-color: #fdbc16;
+  color: white;
+  cursor: pointer;
+}
+#allincall-maximize-popup-tooltip{
+  position: absolute;
+  z-index: 100;
+  visibility: hidden;
+  font-weight: normal;
+  font-size: 12px;
+  line-height: 14px;
+  color: #FFFFFF;
+  z-index: 2147483670;
+  text-align: center;
+  padding: 0px 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: max-content;
+  height: 26px;
+  background: rgba(47, 128, 237, 0.75);
+  border-radius: 2px;
+}
+
+#allincall-minimize-popup {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 22px !important;
+  width: 22px !important;
+  position: absolute;
+  border-radius: 1em;
+  padding: 0px;
+  color: black;
+  cursor: pointer;
+  z-index: 2147483660;
+  text-align: center;
+  font-size: 0.9em;
+  background: #EBEBEB;
+}
+
+#allincall-maximize-popup:hover{
+  background-color: #fdbc16;
+  color: white;
+  cursor: pointer;
+}
+#allincall-minimize-popup-tooltip{
+  position: absolute;
+  z-index: 100;
+  visibility: hidden;
+  font-weight: normal;
+  font-size: 12px;
+  line-height: 14px;
+  color: #FFFFFF;
+  z-index: 2147483670;
+  text-align: center;
+  padding: 0px 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: max-content;
+  height: 26px;
+  background: rgba(47, 128, 237, 0.75);
+  border-radius: 2px;
+}
+#allincall-minimize-popup{
+  right: 9em !important;
+  height: 25px !important;
+  width: 25px !important;
+}
+
+#allincall-minimize-popup:hover svg, #allincall-maximize-popup:hover svg{
+  fill: white;
+}
+
+
+

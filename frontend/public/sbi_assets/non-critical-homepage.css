@@ -1,0 +1,124 @@
+/* 		owl.carousel.min.css -     */		      
+		.owl-carousel,.owl-carousel .owl-item {
+			-webkit-tap-highlight-color: transparent;
+			position: relative;
+		}
+		.owl-carousel { 
+		    display: none;
+		    width: 100%;
+		    z-index: 1;
+		}		
+		
+		.owl-carousel .owl-stage {
+		    position: relative;
+		    -ms-touch-action: pan-Y;
+		    touch-action: manipulation;
+		    -moz-backface-visibility: hidden;
+		}
+		.owl-carousel .owl-stage:after {
+			content: ".";
+			display: block;
+			clear: both;
+			visibility: hidden;
+			line-height: 0;
+			height: 0;
+		}
+		.owl-carousel .owl-stage-outer {
+		    position: relative;
+		    overflow: hidden;
+		    -webkit-transform: translate3d(0,0,0);
+		}
+		.owl-carousel .owl-item, .owl-carousel .owl-wrapper {
+		    -webkit-backface-visibility: hidden;
+		    -moz-backface-visibility: hidden;
+		    -ms-backface-visibility: hidden;
+		    -webkit-transform: translate3d(0,0,0);
+		    -moz-transform: translate3d(0,0,0);
+		    -ms-transform: translate3d(0,0,0);
+		}
+		.owl-carousel .owl-item {
+		    min-height: 1px;
+		    float: left;
+		    -webkit-backface-visibility: hidden;
+		    -webkit-touch-callout: none;
+		}
+		.owl-carousel .owl-item img {
+		    display: block;
+		    width: 100%;
+		}
+		.no-js .owl-carousel, .owl-carousel.owl-loaded {
+		    display: block;
+		}	
+		.owl-carousel .owl-dot, .owl-carousel .owl-nav .owl-next, .owl-carousel .owl-nav .owl-prev {
+			cursor: pointer;
+			user-select: none;
+		}
+		.owl-carousel .owl-nav button.owl-next, .owl-carousel .owl-nav button.owl-prev, .owl-carousel button.owl-dot {
+			background: 0px 0px;
+			color: inherit;
+			border: none;
+			font: inherit;
+			padding: 0px !important;
+		}
+		.owl-carousel.owl-loading {
+			opacity: 0;
+			display: block
+		} 
+		.owl-carousel.owl-drag .owl-item {
+		    -ms-touch-action: pan-y;
+		    touch-action: pan-y;
+		    -webkit-user-select: none;
+		    -moz-user-select: none;
+		    -ms-user-select: none;
+		    user-select: none;
+		}
+		
+		/* owl.theme.default.min.css - */		
+		.owl-theme .owl-nav {
+		    margin-top: 10px;
+		}
+		.owl-theme .owl-dots, .owl-theme .owl-nav {
+		    text-align: center;
+		    -webkit-tap-highlight-color: transparent;
+		}
+		.owl-theme .owl-nav [class*=owl-] {
+		    color: #FFF;
+		    font-size: 14px;
+		    margin: 5px;
+		    padding: 4px 7px;
+		    background: #D6D6D6;
+		    display: inline-block;
+		    cursor: pointer;
+		    border-radius: 3px;
+		}
+		
+		/* non-critical font-awesome.min.css - */
+		@font-face {
+			font-family: 'FontAwesome';
+			src: url('../fonts/fontawesome-webfont.eot?v=4.7.0');
+			src: url('../fonts/fontawesome-webfont.eot?#iefix&v=4.7.0') format('embedded-opentype'),url('../fonts/fontawesome-webfont.woff2?v=4.7.0') format('woff2'),url('../fonts/fontawesome-webfont.woff?v=4.7.0') format('woff'),url('../fonts/fontawesome-webfont.ttf?v=4.7.0') format('truetype'),url('../fonts/fontawesome-webfont.svg?v=4.7.0#fontawesomeregular') format('svg');
+			font-weight: normal;
+			font-style: normal;
+			font-display: swap
+		}
+
+		.fa {
+			display: inline-block;
+			font: normal normal normal 14px/1 FontAwesome;
+			font-size: inherit;
+			text-rendering: auto;
+			-webkit-font-smoothing: antialiased;
+			-moz-osx-font-smoothing: grayscale
+		}
+		.fa-angle-right:before {content: "\f105"}
+		.fa-remove:before, .fa-close:before, .fa-times:before {content: "\f00d"}
+		.fa-caret-right:before {content: "\f0da"}
+		.fa-caret-right:before {content: "\f0da"}
+		.fa-facebook-f:before, .fa-facebook:before {content: "\f09a"}
+		.fa-linkedin:before {content: "\f0e1"}
+		.fa-youtube:before{content:"\f167"}		
+		.fa-instagram:before {content: "\f16d"}
+		.fa-share-alt:before {content: "\f1e0"}
+		.fa-arrow-up:before {content: "\f062"}
+		.fa-refresh:before {content: "\f021"}		
+		.pull-right {float: right;}
