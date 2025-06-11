@@ -57,6 +57,8 @@ const HomePage = () => {
   const [hoveredNavItem, setHoveredNavItem] = useState(null);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [focusedNavItem, setFocusedNavItem] = useState(null);
+  const [hoveredNestedItem, setHoveredNestedItem] = useState(null);
+  const [hoveredSecondNestedItem, setHoveredSecondNestedItem] = useState(null);
   const navRef = React.useRef(null);
   
   // Handle keyboard navigation
@@ -283,12 +285,13 @@ const HomePage = () => {
       subtitle: 'Awareness is assurance', 
       bgColor: 'bg-red-500',
       dropdownItems: [
-        { title: 'About Life Insurance', href: '#', description: 'Understanding life insurance basics' },
-        { title: 'Insurance Guides', href: '#', description: 'Comprehensive guides for better decisions' },
-        { title: 'Financial Planning', href: '#', description: 'Plan your financial future' },
-        { title: 'Insurance Videos', href: '#', description: 'Learn through our informative videos' },
-        { title: 'Insurance Calculators', href: '#', description: 'Calculate your insurance needs' },
-        { title: 'Insurance Glossary', href: '#', description: 'Understand insurance terms' }
+        { title: 'Learn About Insurance', href: '#', description: 'Understanding life insurance basics' },
+        { title: 'Need Assessment', href: '#', description: 'Assess your insurance needs' },
+        { title: 'Tools & Calculators', href: '#', description: 'Calculate your insurance requirements' },
+        { title: 'Partners', href: '#', description: 'Our trusted partners' },
+        { title: 'FAQs', href: '#', description: 'Frequently asked questions' },
+        { title: 'Podcasts', href: '#', description: 'Listen to our insurance podcasts' },
+        { title: 'Knowledge Centre', href: '#', description: 'Expand your insurance knowledge' }
       ]
     },
     { 
@@ -297,13 +300,111 @@ const HomePage = () => {
       subtitle: 'Plans to Manage Your needs', 
       bgColor: 'bg-red-600',
       dropdownItems: [
-        { title: 'Term Insurance', href: '#', description: 'Pure life coverage at affordable rates' },
-        { title: 'Savings Plans', href: '#', description: 'Secure your future financially' },
-        { title: 'Child Plans', href: '#', description: 'Secure your child\'s education and future' },
-        { title: 'Retirement Plans', href: '#', description: 'Plan for a comfortable retirement' },
-        { title: 'Health Insurance', href: '#', description: 'Protect against medical expenses' },
-        { title: 'ULIP Plans', href: '#', description: 'Investment with insurance benefits' },
-        { title: 'Group Insurance', href: '#', description: 'Insurance solutions for organizations' }
+        { 
+          title: 'Individual Life Insurance Plans', 
+          href: '#', 
+          description: 'Personal life insurance solutions',
+          subItems: [
+            {
+              name: 'Online Plans',
+              nestedItems: [
+                'SBI Life - eShield Next',
+                'SBI Life - Smart Scholar Plus', 
+                'SBI Life - Retire Smart Plus',
+                'SBI Life - eWealth Plus',
+                'SBI Life - Smart Elite Plus',
+                'SBI Life - Smart Platina Supreme',
+                'SBI Life - Smart Platina Plus',
+                'SBI Life - Smart Platina Assure',
+                'SBI Life - Smart Annuity Plus',
+                'SBI Life - Smart Fortune Builder',
+                'SBI Life - Smart Swadhan Supreme'
+              ]
+            },
+            {
+              name: 'Saving Plans',
+              nestedItems: [
+                'SBI Life - Smart Platina Plus',
+                'SBI Life - Smart Platina Assure',
+                'SBI Life - Smart Platina Supreme',
+                'SBI Life - Smart Bachat Plus',
+                'SBI Life - New Smart Samriddhi',
+                'SBI Life - Smart Lifetime Saver'
+              ]
+            },
+            {
+              name: 'Protection Plans',
+              nestedItems: [
+                'SBI Life - eShield Next',
+                'SBI Life - Saral Jeevan Bima',
+                'SBI Life - Smart Swadhan Supreme',
+                'SBI Life - eShield Insta',
+                'SBI Life - Smart Shield Premier',
+                'SBI Life - Smart Shield',
+                'SBI Life - Smart Swadhan Neo',
+                'SBI Life - Saral Swadhan Supreme'
+              ]
+            },
+            {
+              name: 'Wealth Creation with Insurance',
+              nestedItems: [
+                'SBI Life - eWealth Plus',
+                'SBI Life - Smart Fortune Builder',
+                'SBI Life - Smart Elite Plus',
+                'SBI Life - Smart Privilege Plus'
+              ]
+            },
+            {
+              name: 'Retirement Plans',
+              nestedItems: [
+                'SBI Life - Retire Smart Plus',
+                'SBI Life - Smart Annuity Plus',
+                'SBI Life - Saral Pension',
+                'SBI Life - Smart Annuity Income'
+              ]
+            },
+            {
+              name: 'Child Plans',
+              nestedItems: [
+                'SBI Life - Smart Scholar Plus',
+                'SBI Life - Smart Future Star',
+                'SBI Life - Smart Platina Young Achiever'
+              ]
+            }
+          ]
+        },
+        { 
+          title: 'Group Insurance Plans', 
+          href: '#', 
+          description: 'Insurance solutions for organizations',
+          subItems: [
+            { 
+              name: 'Corporate Solutions Plans', 
+              nestedItems: [
+                'SBI Life - Kalyan ULIP Plus',
+                'SBI Life - Pradhan Mantri Jeevan Jyoti Bima Yojana',
+                'SBI Life - CapAssure Gold',
+                'SBI Life - Sampoorn Suraksha',
+                'SBI Life - Swarna Jeevan Plus'
+              ]
+            },
+            { 
+              name: 'Group Loan Protection Plans', 
+              nestedItems: [
+                'SBI Life - RiNn Raksha'
+              ]
+            },
+            { 
+              name: 'Group Micro Insurance Plans', 
+              nestedItems: [
+                'SBI Life - Group Micro Shield',
+                'SBI Life - Group Micro Shield - SP'
+              ]
+            }
+          ]
+        },
+        { title: 'Tools & Calculators', href: '#', description: 'Calculate your insurance needs' },
+        { title: 'Need Assessment', href: '#', description: 'Assess your insurance requirements' }
       ]
     },
     { 
@@ -312,12 +413,12 @@ const HomePage = () => {
       subtitle: 'For Existing Customers', 
       bgColor: 'bg-blue-600',
       dropdownItems: [
-        { title: 'Pay Premium', href: '#', description: 'Quick and easy premium payment options' },
-        { title: 'Policy Services', href: '#', description: 'Access and manage your policies' },
-        { title: 'Claims & Maturity', href: '#', description: 'Easy and hassle-free claim process' },
-        { title: 'Download Forms', href: '#', description: 'Access all required documentation' },
+        { title: 'Services', href: '#', description: 'General customer services' },
+        { title: 'Claims and Maturity', href: '#', description: 'Easy and hassle-free claim process' },
+        { title: 'NRI Corner', href: '#', description: 'Services for Non-Resident Indians' },
+        { title: 'Download Centre', href: '#', description: 'Access all required documentation' },
         { title: 'NAV & Fund Performance', href: '#', description: 'Track your investment performance' },
-        { title: 'Branch Locator', href: '#', description: 'Find SBI Life branches near you' }
+        { title: 'FAQs', href: '#', description: 'Frequently asked questions' }
       ]
     },
     { 
@@ -326,12 +427,9 @@ const HomePage = () => {
       subtitle: 'SBI Life', 
       bgColor: 'bg-purple-600',
       dropdownItems: [
-        { title: 'Company Profile', href: '#', description: 'Know more about SBI Life' },
-        { title: 'Board of Directors', href: '#', description: 'Meet our leadership team' },
-        { title: 'Financial Information', href: '#', description: 'View our financial performance' },
-        { title: 'CSR Initiatives', href: '#', description: 'Our corporate social responsibility' },
-        { title: 'Awards & Recognition', href: '#', description: 'Our achievements' },
-        { title: 'Career Opportunities', href: '#', description: 'Join our growing team' }
+        { title: 'About Us', href: '#', description: 'Know more about SBI Life' },
+        { title: 'Key Milestones', href: '#', description: 'Our journey and achievements' },
+        { title: 'Awards, CSR, Media Centre, Investor Relations, Careers, LifeVerse', href: '#', description: 'Company information and opportunities' }
       ]
     },
     { 
@@ -340,11 +438,7 @@ const HomePage = () => {
       subtitle: 'SBI Life', 
       bgColor: 'bg-purple-700',
       dropdownItems: [
-        { title: 'Customer Care', href: '#', description: '24x7 support for all your queries' },
-        { title: 'Grievance Redressal', href: '#', description: 'Resolution for your concerns' },
-        { title: 'Branch Network', href: '#', description: 'Visit our offices across India' },
-        { title: 'Feedback', href: '#', description: 'Share your experience with us' },
-        { title: 'Contact Information', href: '#', description: 'Reach out to us' }
+        { title: 'Contact Us', href: '#', description: 'Get in touch with us' }
       ]
     }
   ];
@@ -580,9 +674,9 @@ const HomePage = () => {
                     <div className="nav-dropdown">
                       <div className="dropdown-container">
                         <div className="dropdown-submenu">
-                          {['Life Insurance Basics', 'Investment Planning', 'Tax Benefits', 'Financial Literacy'].map((item, index) => (
-                            <button key={item} className="dropdown-submenu-item">
-                              {item}
+                          {navigationItems.find(item => item.name === 'LEARN').dropdownItems.map((item, index) => (
+                            <button key={item.title} className="dropdown-submenu-item">
+                              {item.title}
                             </button>
                           ))}
                         </div>
@@ -598,10 +692,100 @@ const HomePage = () => {
                     <div className="nav-dropdown">
                       <div className="dropdown-container">
                         <div className="dropdown-submenu">
-                          {['Term Plans', 'ULIP', 'Savings Plans', 'Retirement Plans', 'Child Plans'].map((item, index) => (
-                            <button key={item} className="dropdown-submenu-item">
-                              {item}
-                            </button>
+                          {navigationItems.find(item => item.name === 'PRODUCTS').dropdownItems.map((item, index) => (
+                            <div key={item.title} className="relative">
+                              <button 
+                                className={`dropdown-submenu-item ${item.subItems ? 'flex items-center' : ''}`}
+                                onMouseEnter={() => item.subItems && setHoveredNestedItem(item.title)}
+                                onMouseLeave={() => item.subItems && setHoveredNestedItem(null)}
+                              >
+                                {item.title}
+                                {item.subItems && (
+                                  <ChevronRight className="w-4 h-4 ml-2" />
+                                )}
+                              </button>
+                              
+                              {/* First Level Nested Dropdown - Below Parent */}
+                              {item.subItems && hoveredNestedItem === item.title && (
+                                <div 
+                                  className="absolute top-full left-0 w-80 shadow-lg z-50"
+                                  style={{
+                                    background: 'linear-gradient(to right, #8B0000, #B22222, #4B0082, #483D8B, #2F1B69)',
+                                    boxShadow: '0 4px 20px rgba(0, 0, 0, 0.2)'
+                                  }}
+                                  onMouseEnter={() => setHoveredNestedItem(item.title)}
+                                  onMouseLeave={() => {
+                                    setHoveredNestedItem(null);
+                                    setHoveredSecondNestedItem(null);
+                                  }}
+                                >
+                                  {item.subItems.map((subItem, subIndex) => (
+                                    <div key={subIndex} className="relative">
+                                      {typeof subItem === 'object' && subItem.nestedItems ? (
+                                        <>
+                                          <div
+                                            className="flex items-center justify-between px-4 py-3 text-white hover:bg-white hover:bg-opacity-10 transition-colors border-b border-white border-opacity-20 cursor-pointer"
+                                            style={{
+                                              color: 'rgba(255, 255, 255, 0.9)',
+                                              fontWeight: '500',
+                                              fontSize: '14px',
+                                              letterSpacing: '0.3px'
+                                            }}
+                                            onMouseEnter={() => setHoveredSecondNestedItem(subItem.name)}
+                                            onMouseLeave={() => setHoveredSecondNestedItem(null)}
+                                          >
+                                            <span>{subItem.name}</span>
+                                            <ChevronRight className="w-4 h-4 ml-2" />
+                                          </div>
+                                          
+                                          {/* Second Level Nested Dropdown - Parallel to First Level */}
+                                          {hoveredSecondNestedItem === subItem.name && (
+                                            <div 
+                                              className="absolute top-0 left-full w-96 shadow-lg z-60"
+                                              style={{
+                                                background: '#8B1538',
+                                                boxShadow: '0 4px 20px rgba(0, 0, 0, 0.3)'
+                                              }}
+                                              onMouseEnter={() => setHoveredSecondNestedItem(subItem.name)}
+                                              onMouseLeave={() => setHoveredSecondNestedItem(null)}
+                                            >
+                                              {subItem.nestedItems.map((nestedItem, nestedIndex) => (
+                                                <a
+                                                  key={nestedIndex}
+                                                  href="#"
+                                                  className="block px-4 py-3 text-white hover:bg-blue-600 hover:text-white transition-colors border-b border-white border-opacity-20 last:border-b-0"
+                                                  style={{
+                                                    color: 'rgba(255, 255, 255, 0.95)',
+                                                    fontWeight: '500',
+                                                    fontSize: '13px',
+                                                    letterSpacing: '0.2px'
+                                                  }}
+                                                >
+                                                  {nestedItem}
+                                                </a>
+                                              ))}
+                                            </div>
+                                          )}
+                                        </>
+                                      ) : (
+                                        <a
+                                          href="#"
+                                          className="block px-4 py-3 text-white hover:bg-white hover:bg-opacity-10 transition-colors border-b border-white border-opacity-20 last:border-b-0"
+                                          style={{
+                                            color: 'rgba(255, 255, 255, 0.9)',
+                                            fontWeight: '500',
+                                            fontSize: '14px',
+                                            letterSpacing: '0.3px'
+                                          }}
+                                        >
+                                          {typeof subItem === 'string' ? subItem : subItem.name || subItem.title}
+                                        </a>
+                                      )}
+                                    </div>
+                                  ))}
+                                </div>
+                              )}
+                            </div>
                           ))}
                         </div>
                       </div>
@@ -616,9 +800,9 @@ const HomePage = () => {
                     <div className="nav-dropdown">
                       <div className="dropdown-container">
                         <div className="dropdown-submenu">
-                          {['Services', 'Claims and Maturity', 'NRI Corner', 'Download Centre', 'NAV & Fund Performance', 'FAQs'].map((item, index) => (
-                            <button key={item} className="dropdown-submenu-item">
-                              {item}
+                          {navigationItems.find(item => item.name === 'SERVICES').dropdownItems.map((item, index) => (
+                            <button key={item.title} className="dropdown-submenu-item">
+                              {item.title}
                             </button>
                           ))}
                         </div>
@@ -634,9 +818,9 @@ const HomePage = () => {
                     <div className="nav-dropdown">
                       <div className="dropdown-container">
                         <div className="dropdown-submenu">
-                          {['Our Company', 'Leadership', 'Awards', 'CSR', 'Careers'].map((item, index) => (
-                            <button key={item} className="dropdown-submenu-item">
-                              {item}
+                          {navigationItems.find(item => item.name === 'ABOUT').dropdownItems.map((item, index) => (
+                            <button key={item.title} className="dropdown-submenu-item">
+                              {item.title}
                             </button>
                           ))}
                         </div>
@@ -652,9 +836,9 @@ const HomePage = () => {
                     <div className="nav-dropdown">
                       <div className="dropdown-container">
                         <div className="dropdown-submenu">
-                          {['Branch Locator', 'Customer Care', 'Grievance', 'Feedback', 'Agent Login'].map((item, index) => (
-                            <button key={item} className="dropdown-submenu-item">
-                              {item}
+                          {navigationItems.find(item => item.name === 'CONTACT-US').dropdownItems.map((item, index) => (
+                            <button key={item.title} className="dropdown-submenu-item">
+                              {item.title}
                             </button>
                           ))}
                         </div>

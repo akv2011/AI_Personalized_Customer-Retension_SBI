@@ -61,6 +61,7 @@ html, body, #root {
   align-items: center;
   gap: 0;
   height: 100%;
+  position: relative;
 }
 
 /* Individual navigation tab buttons */
@@ -95,7 +96,7 @@ html, body, #root {
 
 /* Dropdown group container for each tab */
 .nav-dropdown-group {
-  position: relative;
+  position: static;
   display: flex;
   align-items: center;
   height: 100%;
@@ -108,15 +109,12 @@ html, body, #root {
   transform: translateY(0);
 }
 
-/* Full-width dropdown bar for all tabs */
+/* Navbar-width dropdown bar for tabs */
 .nav-dropdown {
   position: absolute;
   top: 100%;
-  left: 50%;
-  right: 50%;
-  margin-left: -50vw;
-  margin-right: -50vw;
-  width: 100vw;
+  left: 0;
+  width: 100%;
   height: 48px;
   background: linear-gradient(to right, #8B0000, #B22222, #4B0082, #483D8B, #2F1B69);
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
@@ -131,12 +129,11 @@ html, body, #root {
 
 /* Dropdown container */
 .dropdown-container {
-  max-width: 1400px;
-  margin: 0 auto;
-  padding: 0 60px;
-  display: flex;
-  justify-content: center;
   width: 100%;
+  margin: 0;
+  padding: 0 24px;
+  display: flex;
+  justify-content: flex-start;
   height: 100%;
   align-items: center;
   min-width: 0;
@@ -145,12 +142,11 @@ html, body, #root {
 /* Dropdown submenu container */
 .dropdown-submenu {
   display: flex;
-  justify-content: center;
+  justify-content: flex-start;
   align-items: center;
   gap: 40px;
   padding: 0;
-  width: auto;
-  max-width: 100%;
+  width: 100%;
   height: 100%;
   flex-wrap: nowrap;
   overflow: visible;
@@ -160,7 +156,7 @@ html, body, #root {
 /* Responsive adjustments for dropdown */
 @media (max-width: 1400px) {
   .dropdown-container {
-    padding: 0 40px;
+    padding: 0 24px;
   }
   .dropdown-submenu {
     gap: 32px;
@@ -169,7 +165,7 @@ html, body, #root {
 
 @media (max-width: 1200px) {
   .dropdown-container {
-    padding: 0 30px;
+    padding: 0 24px;
   }
   .dropdown-submenu {
     gap: 24px;
@@ -183,7 +179,7 @@ html, body, #root {
 
 @media (max-width: 1024px) {
   .dropdown-container {
-    padding: 0 20px;
+    padding: 0 24px;
   }
   .dropdown-submenu {
     gap: 20px;
