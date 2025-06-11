@@ -429,7 +429,12 @@ const HomePage = () => {
       dropdownItems: [
         { title: 'About Us', href: '#', description: 'Know more about SBI Life' },
         { title: 'Key Milestones', href: '#', description: 'Our journey and achievements' },
-        { title: 'Awards, CSR, Media Centre, Investor Relations, Careers, LifeVerse', href: '#', description: 'Company information and opportunities' }
+        { title: 'Awards', href: '#', description: 'Our awards and recognitions' },
+        { title: 'CSR', href: '#', description: 'Corporate Social Responsibility' },
+        { title: 'Media Centre', href: '#', description: 'Latest news and updates' },
+        { title: 'Investor Relations', href: '#', description: 'Information for investors' },
+        { title: 'Careers', href: '#', description: 'Join our team' },
+        { title: 'LifeVerse', href: '#', description: 'Our digital ecosystem' }
       ]
     },
     { 

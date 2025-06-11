@@ -113,8 +113,9 @@ html, body, #root {
 .nav-dropdown {
   position: absolute;
   top: 100%;
-  left: 0;
-  width: 100%;
+  left: calc(20% - 24px);
+  right: 0;
+  width: calc(80% + 100vw - 100%);
   height: 48px;
   background: linear-gradient(to right, #8B0000, #B22222, #4B0082, #483D8B, #2F1B69);
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
@@ -130,8 +131,9 @@ html, body, #root {
 /* Dropdown container */
 .dropdown-container {
   width: 100%;
+  max-width: none;
   margin: 0;
-  padding: 0 24px;
+  padding: 0 24px 0 48px;
   display: flex;
   justify-content: flex-start;
   height: 100%;
