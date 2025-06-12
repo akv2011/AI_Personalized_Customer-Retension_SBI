@@ -5,6 +5,8 @@
   "dependencies": {
     "@headlessui/react": "^2.2.0",
     "@hyperbrowser/agent": "^0.3.1",
+    "@modelcontextprotocol/sdk": "^1.12.1",
+    "@modelcontextprotocol/server-postgres": "^0.6.2",
     "@testing-library/dom": "^10.4.0",
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^16.2.0",

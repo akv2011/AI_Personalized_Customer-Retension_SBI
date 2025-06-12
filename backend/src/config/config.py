@@ -13,6 +13,19 @@ BACKEND_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__))) # Poin
 FAISS_INDEX_PATH = os.path.join(BACKEND_DIR, "faiss_index.idx")
 SYSTEM_PROMPT_PATH = os.path.join(os.path.dirname(__file__), "system_prompt.txt") # Path to the system prompt file
 
+# --- PostgreSQL MCP Configuration ---
+DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://sbi_user:sbi_password@localhost:5432/sbi_personalization")
+POSTGRES_HOST = os.getenv("POSTGRES_HOST", "localhost")
+POSTGRES_PORT = os.getenv("POSTGRES_PORT", "5432")
+POSTGRES_DB = os.getenv("POSTGRES_DB", "sbi_personalization")
+POSTGRES_USER = os.getenv("POSTGRES_USER", "sbi_user")
+POSTGRES_PASSWORD = os.getenv("POSTGRES_PASSWORD", "sbi_password")
+
+# --- MCP Server Configuration ---
+MCP_SERVER_NAME = os.getenv("MCP_SERVER_NAME", "sbi-postgres-mcp")
+MCP_SERVER_COMMAND = "mcp-server-postgres"
+MCP_SERVER_ARGS = [DATABASE_URL]
+
 # --- Other Configurations (if any) ---
 # Example: Default language
 DEFAULT_LANGUAGE = "en"
