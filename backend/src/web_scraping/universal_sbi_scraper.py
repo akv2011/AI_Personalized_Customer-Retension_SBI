@@ -433,3 +433,4 @@ if __name__ == "__main__":
         print(f"Product detected: {result['product_name']}")
         print(f"Success: {result['success']}")
         print(f"Steps: {len(result['steps'])}")
+## hi
