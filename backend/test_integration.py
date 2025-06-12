@@ -164,9 +164,9 @@ def test_mcp_operations():
         print(f"   ❌ MCP operations error: {e}")
         return False
 
-def test_gemini_search():
-    """Test Gemini search endpoint"""
-    print("\n🔍 Testing Gemini search...")
+def test_exa_search():
+    """Test Exa search endpoint"""
+    print("\n🔍 Testing Exa search...")
     
     try:
         response = requests.post(
@@ -180,16 +180,16 @@ def test_gemini_search():
         
         if response.status_code == 200:
             data = response.json()
-            print(f"   ✅ Gemini search successful")
+            print(f"   ✅ Exa search successful")
             print(f"   🔍 Response: {data.get('response', 'No response')[:150]}...")
             return True
         else:
-            print(f"   ❌ Gemini search failed with status {response.status_code}")
+            print(f"   ❌ Exa search failed with status {response.status_code}")
             print(f"   📄 Response: {response.text}")
             return False
             
     except Exception as e:
-        print(f"   ❌ Gemini search error: {e}")
+        print(f"   ❌ Exa search error: {e}")
         return False
 
 def cleanup_test_data():
@@ -260,7 +260,7 @@ def main():
         ("Customer Profile", test_customer_profile),
         ("Analytics", test_analytics),
         ("MCP Operations", test_mcp_operations),
-        ("Gemini Search", test_gemini_search)
+        ("Exa Search", test_exa_search)
     ]
     
     passed_tests = 0

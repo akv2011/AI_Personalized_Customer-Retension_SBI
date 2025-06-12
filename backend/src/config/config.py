@@ -6,6 +6,7 @@ load_dotenv()  # Load environment variables from .env file
 # --- API Keys ---
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY") # Add Google API Key
+EXA_API_KEY = os.getenv("EXA_API_KEY") # Add Exa API Key
 
 # --- FAISS Configuration ---
 # Define the path for the FAISS index file relative to the backend directory

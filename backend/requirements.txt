@@ -15,12 +15,26 @@ pandas
 deep_translator
 langchain==0.0.340 # Added for text splitting
 requests==2.31.0  # Added for Brave Search API calls
+exa-py  # Added for Exa web search API
 
 # PostgreSQL MCP dependencies
 psycopg2-binary>=2.9.0
 sqlalchemy>=2.0.0
 asyncpg>=0.28.0
 alembic>=1.12.0
+
+# Speech Services
+# ElevenLabs (premium for Hindi/English)
+elevenlabs>=0.2.26
+requests>=2.31.0
+
+# Free TTS/STT (for Marathi and fallback)
+gtts>=2.3.2
+pyttsx3>=2.90
+SpeechRecognition>=3.10.0
+pygame>=2.5.2
+pydub>=0.25.1
+pyaudio>=0.2.11
 
 # Development and Testing
 pytest>=7.0.0
