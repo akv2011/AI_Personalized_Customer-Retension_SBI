@@ -28,7 +28,8 @@ import {
   Globe,
   ChevronLeft,
   UserPlus,
-  ChevronDown
+  ChevronDown,
+  Calendar
 } from 'lucide-react';
 import ChatInterface from './ChatInterface';
 
@@ -764,6 +765,12 @@ const HomePage = () => {
                                                     fontWeight: '500',
                                                     fontSize: '13px',
                                                     letterSpacing: '0.2px'
+                                                  }}
+                                                  onClick={(e) => {
+                                                    e.preventDefault();
+                                                    if (nestedItem === 'SBI Life - Smart Swadhan Supreme') {
+                                                      setIsSearchModalOpen(true);
+                                                    }
                                                   }}
                                                 >
                                                   {nestedItem}
@@ -1632,149 +1639,321 @@ const HomePage = () => {
       {/* Smart Swadhan Supreme Search Result Modal */}
       {isSearchModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
-            <div className="p-6 border-b border-gray-200 flex justify-between items-center">
-              <h2 className="text-3xl font-bold text-gray-900">SBI Life - Smart Swadhan Supreme</h2>
+          <div className="bg-white rounded-lg max-w-6xl w-full max-h-[95vh] overflow-y-auto">
+            <div className="p-6 border-b border-gray-200 flex justify-between items-center bg-gradient-to-r from-blue-50 to-purple-50">
+              <div className="flex items-center space-x-3">
+                <Shield className="w-8 h-8 text-blue-600" />
+                <div>
+                  <h2 className="text-3xl font-bold text-gray-900">SBI Life - Smart Swadhan Supreme</h2>
+                  <p className="text-sm text-gray-600">Life Insurance Savings Plan with Return of Premium</p>
+                </div>
+              </div>
               <button
                 onClick={() => setIsSearchModalOpen(false)}
-                className="text-gray-400 hover:text-gray-600"
+                className="text-gray-400 hover:text-gray-600 p-2 rounded-full hover:bg-gray-100 transition-colors"
               >
                 <X className="w-6 h-6" />
               </button>
             </div>
+            
             <div className="p-6">
-              {/* Product Header */}
+              {/* Product Overview */}
               <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg p-6 mb-6">
-                <div className="flex items-start space-x-4">
-                  <div className="w-16 h-16 bg-blue-100 rounded-lg flex items-center justify-center">
-                    <Shield className="w-8 h-8 text-blue-600" />
-                  </div>
+                <div className="flex items-start justify-between">
                   <div className="flex-1">
-                    <h3 className="text-2xl font-bold text-gray-900 mb-2">SBI Life - Smart Swadhan Supreme</h3>
-                    <p className="text-sm text-gray-600 mb-2">UIN: 111N140V02</p>
-                    <p className="text-sm text-gray-500">Individual, Non-Linked, Non-Participating, Life Insurance Savings Product</p>
-                    <div className="flex items-center mt-3 space-x-6">
-                      <div className="flex items-center">
-                        <Star className="w-4 h-4 text-yellow-400 fill-current" />
-                        <span className="text-sm text-gray-600 ml-1">Guaranteed Returns</span>
-                      </div>
-                      <div className="flex items-center">
-                        <Gift className="w-4 h-4 text-green-600" />
-                        <span className="text-sm text-gray-600 ml-1">Tax Benefits</span>
-                      </div>
-                      <div className="flex items-center">
-                        <Heart className="w-4 h-4 text-red-600" />
-                        <span className="text-sm text-gray-600 ml-1">Life Protection</span>
-                      </div>
+                    <h3 className="text-2xl font-bold text-gray-900 mb-3">An Individual, Non-Linked, Non-Participating Life Insurance Savings Product</h3>
+                    <p className="text-gray-700 mb-4">
+                      Secure your family's future to ensure they lead a comfortable life without any financial hardship even when you are not around. 
+                      Introducing <strong>SBI Life - Smart Swadhan Supreme</strong>, that provides life cover at affordable premiums and also returns 
+                      Total Premium Paid at the end of policy term, upon survival.
+                    </p>
+                    <div className="flex items-center space-x-2 mb-3">
+                      <span className="text-sm font-semibold text-gray-600">UIN:</span>
+                      <span className="text-sm text-gray-700 bg-white px-2 py-1 rounded">111N140V02</span>
+                    </div>
+                    <div className="flex flex-wrap gap-3">
+                      <span className="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-medium">Protection</span>
+                      <span className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium">Security</span>
+                      <span className="bg-purple-100 text-purple-800 px-3 py-1 rounded-full text-sm font-medium">Return of Premium</span>
+                      <span className="bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full text-sm font-medium">Tax Benefits</span>
                     </div>
                   </div>
-                  <div className="text-right">
-                    <button className="bg-blue-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-blue-700 transition-colors mb-2 block">
-                      Know More
-                    </button>
-                    <button className="bg-green-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-green-700 transition-colors block">
-                      Buy Online
-                    </button>
+                  <div className="text-right ml-6">
+                    <div className="space-y-2">
+                      <button className="w-full bg-blue-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-blue-700 transition-colors">
+                        Calculate Premium
+                      </button>
+                      <button className="w-full bg-green-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-green-700 transition-colors">
+                        Buy Online
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>
 
-              {/* Product Details */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+              {/* Features & Advantages */}
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
                 <div>
-                  <h4 className="text-xl font-semibold text-gray-800 mb-4">Key Features</h4>
-                  <ul className="space-y-3">
-                    <li className="flex items-start">
-                      <div className="w-2 h-2 bg-blue-500 rounded-full mr-3 mt-2"></div>
-                      <span className="text-gray-700">Guaranteed return of 100% of the total premiums paid on maturity</span>
-                    </li>
-                    <li className="flex items-start">
-                      <div className="w-2 h-2 bg-blue-500 rounded-full mr-3 mt-2"></div>
-                      <span className="text-gray-700">Life insurance protection throughout the policy term</span>
-                    </li>
-                    <li className="flex items-start">
-                      <div className="w-2 h-2 bg-blue-500 rounded-full mr-3 mt-2"></div>
-                      <span className="text-gray-700">Flexible premium payment options</span>
-                    </li>
-                    <li className="flex items-start">
-                      <div className="w-2 h-2 bg-blue-500 rounded-full mr-3 mt-2"></div>
-                      <span className="text-gray-700">Tax benefits under Section 80C and 10(10D)</span>
-                    </li>
-                    <li className="flex items-start">
-                      <div className="w-2 h-2 bg-blue-500 rounded-full mr-3 mt-2"></div>
-                      <span className="text-gray-700">Optional riders for enhanced protection</span>
-                    </li>
-                  </ul>
+                  <h4 className="text-2xl font-semibold text-gray-800 mb-6 flex items-center">
+                    <Star className="w-6 h-6 text-yellow-500 mr-2" />
+                    Key Features
+                  </h4>
+                  <div className="space-y-4">
+                    <div className="flex items-start space-x-3 p-4 bg-blue-50 rounded-lg">
+                      <Shield className="w-5 h-5 text-blue-600 mt-0.5" />
+                      <div>
+                        <h5 className="font-semibold text-blue-800">Protection</h5>
+                        <p className="text-gray-700 text-sm">Life Insurance cover at an affordable cost to protect yourself</p>
+                      </div>
+                    </div>
+                    <div className="flex items-start space-x-3 p-4 bg-green-50 rounded-lg">
+                      <Calculator className="w-5 h-5 text-green-600 mt-0.5" />
+                      <div>
+                        <h5 className="font-semibold text-green-800">Convenience</h5>
+                        <p className="text-gray-700 text-sm">Pay premium regularly or for a limited (7/10/15 years) period</p>
+                      </div>
+                    </div>
+                    <div className="flex items-start space-x-3 p-4 bg-purple-50 rounded-lg">
+                      <Heart className="w-5 h-5 text-purple-600 mt-0.5" />
+                      <div>
+                        <h5 className="font-semibold text-purple-800">Flexibility</h5>
+                        <p className="text-gray-700 text-sm">Choose policy term from 10 years to 30 years</p>
+                      </div>
+                    </div>
+                    <div className="flex items-start space-x-3 p-4 bg-yellow-50 rounded-lg">
+                      <Gift className="w-5 h-5 text-yellow-600 mt-0.5" />
+                      <div>
+                        <h5 className="font-semibold text-yellow-800">Maturity Benefit</h5>
+                        <p className="text-gray-700 text-sm">Get 100% of Total Premiums Paid as Maturity benefit</p>
+                      </div>
+                    </div>
+                    <div className="flex items-start space-x-3 p-4 bg-red-50 rounded-lg">
+                      <Users className="w-5 h-5 text-red-600 mt-0.5" />
+                      <div>
+                        <h5 className="font-semibold text-red-800">Enhanced Protection</h5>
+                        <p className="text-gray-700 text-sm">Optional Accident Benefit Rider available</p>
+                      </div>
+                    </div>
+                    <div className="flex items-start space-x-3 p-4 bg-indigo-50 rounded-lg">
+                      <CreditCard className="w-5 h-5 text-indigo-600 mt-0.5" />
+                      <div>
+                        <h5 className="font-semibold text-indigo-800">Tax Benefits</h5>
+                        <p className="text-gray-700 text-sm">As per the prevailing norms under the Income Tax Act, 1961</p>
+                      </div>
+                    </div>
+                  </div>
                 </div>
+
                 <div>
-                  <h4 className="text-xl font-semibold text-gray-800 mb-4">Eligibility</h4>
-                  <div className="space-y-3">
-                    <div className="bg-gray-50 p-4 rounded-lg">
-                      <h5 className="font-semibold text-gray-700 mb-2">Entry Age</h5>
-                      <p className="text-gray-600">18 years to 60 years (age last birthday)</p>
+                  <h4 className="text-2xl font-semibold text-gray-800 mb-6 flex items-center">
+                    <Globe className="w-6 h-6 text-green-500 mr-2" />
+                    Plan Advantages
+                  </h4>
+                  <div className="space-y-6">
+                    <div className="border border-gray-200 rounded-lg p-5">
+                      <h5 className="font-bold text-gray-800 mb-3 flex items-center">
+                        <Shield className="w-5 h-5 text-blue-600 mr-2" />
+                        Security
+                      </h5>
+                      <p className="text-gray-700">Protect your family's future with life cover at an affordable cost</p>
                     </div>
-                    <div className="bg-gray-50 p-4 rounded-lg">
-                      <h5 className="font-semibold text-gray-700 mb-2">Policy Term</h5>
-                      <p className="text-gray-600">10 years to 30 years</p>
+                    <div className="border border-gray-200 rounded-lg p-5">
+                      <h5 className="font-bold text-gray-800 mb-3 flex items-center">
+                        <Star className="w-5 h-5 text-green-600 mr-2" />
+                        Reliability
+                      </h5>
+                      <p className="text-gray-700">Assurance of getting back the total premiums paid by you, on maturity</p>
                     </div>
-                    <div className="bg-gray-50 p-4 rounded-lg">
-                      <h5 className="font-semibold text-gray-700 mb-2">Premium Payment</h5>
-                      <p className="text-gray-600">Regular Pay / Limited Pay options</p>
+                    <div className="border border-gray-200 rounded-lg p-5">
+                      <h5 className="font-bold text-gray-800 mb-3 flex items-center">
+                        <Heart className="w-5 h-5 text-purple-600 mr-2" />
+                        Flexibility
+                      </h5>
+                      <p className="text-gray-700">Freedom to decide your policy term and premium payment frequency as per your requirements</p>
+                    </div>
+                    <div className="border border-gray-200 rounded-lg p-5">
+                      <h5 className="font-bold text-gray-800 mb-3 flex items-center">
+                        <Gift className="w-5 h-5 text-yellow-600 mr-2" />
+                        Tax Benefits
+                      </h5>
+                      <p className="text-gray-700">Eligible for Income Tax benefits/exemptions as per applicable laws</p>
                     </div>
                   </div>
                 </div>
               </div>
 
-              {/* Benefits Section */}
-              <div className="mb-6">
-                <h4 className="text-xl font-semibold text-gray-800 mb-4">Benefits</h4>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div className="border border-gray-200 rounded-lg p-4">
-                    <h5 className="font-semibold text-blue-600 mb-2">Death Benefit</h5>
-                    <p className="text-gray-600 text-sm">Highest of Basic Sum Assured, 11 times Annualized Premium, or 105% of Total Premiums Paid</p>
+              {/* Benefits Details */}
+              <div className="mb-8">
+                <h4 className="text-2xl font-semibold text-gray-800 mb-6 flex items-center">
+                  <Gift className="w-6 h-6 text-green-500 mr-2" />
+                  Plan Benefits
+                </h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="bg-red-50 border border-red-200 rounded-lg p-6">
+                    <h5 className="text-xl font-bold text-red-700 mb-4 flex items-center">
+                      <Heart className="w-5 h-5 mr-2" />
+                      Death Benefit
+                    </h5>
+                    <p className="text-gray-700 mb-4">
+                      In the unfortunate event of death of the Life Assured during the policy term, Sum Assured on Death will be payable to the beneficiary in lump sum.
+                    </p>
+                    <div className="bg-white p-4 rounded-lg">
+                      <p className="font-semibold text-gray-800 mb-2">Sum assured on death will be higher of:</p>
+                      <ol className="list-decimal list-inside space-y-2 text-sm text-gray-700">
+                        <li>Basic Sum Assured* or</li>
+                        <li>11 times of Annualized Premium^ or</li>
+                        <li>105% of the Total Premiums Paid# up to the date of death</li>
+                      </ol>
+                    </div>
                   </div>
-                  <div className="border border-gray-200 rounded-lg p-4">
-                    <h5 className="font-semibold text-green-600 mb-2">Maturity Benefit</h5>
-                    <p className="text-gray-600 text-sm">100% return of total premiums paid during the policy term</p>
-                  </div>
-                  <div className="border border-gray-200 rounded-lg p-4">
-                    <h5 className="font-semibold text-purple-600 mb-2">Surrender Value</h5>
-                    <p className="text-gray-600 text-sm">Guaranteed Surrender Value available after paying premiums for 2 full years</p>
+                  
+                  <div className="bg-green-50 border border-green-200 rounded-lg p-6">
+                    <h5 className="text-xl font-bold text-green-700 mb-4 flex items-center">
+                      <Star className="w-5 h-5 mr-2" />
+                      Maturity Benefit
+                    </h5>
+                    <p className="text-gray-700 mb-4">
+                      On survival of the Life Assured till the end of policy term, 100% of the Total Premiums Paid# during the policy tenure, shall be paid in lump sum.
+                    </p>
+                    <div className="bg-white p-4 rounded-lg">
+                      <p className="text-sm text-gray-600">
+                        <strong>Note:</strong> Total Premiums Paid means total of all the premiums paid under the base product excluding any extra premium and taxes, if collected explicitly.
+                      </p>
+                    </div>
                   </div>
                 </div>
               </div>
 
-              {/* Available Riders */}
-              <div className="mb-6">
-                <h4 className="text-xl font-semibold text-gray-800 mb-4">Optional Riders</h4>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="bg-blue-50 p-4 rounded-lg">
-                    <h5 className="font-semibold text-blue-700 mb-2">Accident Benefit Rider</h5>
-                    <p className="text-gray-600 text-sm">Additional protection in case of accidental death or disability</p>
+              {/* Eligibility & Terms */}
+              <div className="mb-8">
+                <h4 className="text-2xl font-semibold text-gray-800 mb-6 flex items-center">
+                  <Users className="w-6 h-6 text-blue-500 mr-2" />
+                  Eligibility & Terms
+                </h4>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <div className="bg-blue-50 p-6 rounded-lg text-center">
+                    <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <UserPlus className="w-8 h-8 text-blue-600" />
+                    </div>
+                    <h5 className="font-bold text-blue-800 mb-2">Entry Age</h5>
+                    <p className="text-gray-700">18 years to 60 years</p>
+                    <p className="text-xs text-gray-500 mt-1">(age last birthday)</p>
                   </div>
-                  <div className="bg-green-50 p-4 rounded-lg">
-                    <h5 className="font-semibold text-green-700 mb-2">Critical Illness Rider</h5>
-                    <p className="text-gray-600 text-sm">Coverage for specified critical illnesses</p>
+                  <div className="bg-purple-50 p-6 rounded-lg text-center">
+                    <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <Calendar className="w-8 h-8 text-purple-600" />
+                    </div>
+                    <h5 className="font-bold text-purple-800 mb-2">Policy Term</h5>
+                    <p className="text-gray-700">10 years to 30 years</p>
+                    <p className="text-xs text-gray-500 mt-1">Flexible duration</p>
+                  </div>
+                  <div className="bg-green-50 p-6 rounded-lg text-center">
+                    <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <CreditCard className="w-8 h-8 text-green-600" />
+                    </div>
+                    <h5 className="font-bold text-green-800 mb-2">Premium Payment</h5>
+                    <p className="text-gray-700">Regular Pay or Limited Pay</p>
+                    <p className="text-xs text-gray-500 mt-1">(7/10/15 years options)</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Optional Riders */}
+              <div className="mb-8">
+                <h4 className="text-2xl font-semibold text-gray-800 mb-6 flex items-center">
+                  <Shield className="w-6 h-6 text-purple-500 mr-2" />
+                  Optional Riders
+                </h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="bg-gradient-to-br from-blue-50 to-blue-100 border border-blue-200 rounded-lg p-6">
+                    <h5 className="text-lg font-bold text-blue-800 mb-3">SBI Life - Accident Benefit Rider</h5>
+                    <p className="text-gray-700 mb-4">UIN: 111B041V01</p>
+                    <div className="space-y-3">
+                      <div className="bg-white p-3 rounded">
+                        <h6 className="font-semibold text-blue-700">Option A: Accidental Death Benefit (ADB)</h6>
+                        <p className="text-sm text-gray-600">Additional protection in case of accidental death</p>
+                      </div>
+                      <div className="bg-white p-3 rounded">
+                        <h6 className="font-semibold text-blue-700">Option B: Accidental Partial Permanent Disability Benefit (APPD)</h6>
+                        <p className="text-sm text-gray-600">Coverage for accidental partial permanent disability</p>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="bg-gradient-to-br from-gray-50 to-gray-100 border border-gray-200 rounded-lg p-6 flex items-center justify-center text-center">
+                    <div>
+                      <Shield className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                      <h5 className="text-lg font-semibold text-gray-600 mb-2">Additional Riders</h5>
+                      <p className="text-gray-500">Other riders may be available</p>
+                      <p className="text-sm text-gray-400 mt-2">Please consult with our advisors for complete rider options</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Important Notes */}
+              <div className="mb-8 bg-yellow-50 border border-yellow-200 rounded-lg p-6">
+                <h4 className="text-lg font-semibold text-yellow-800 mb-4 flex items-center">
+                  <MessageCircle className="w-5 h-5 mr-2" />
+                  Important Notes
+                </h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-700">
+                  <div>
+                    <p className="mb-2">
+                      <strong>*</strong> The basic sum assured is the absolute amount of benefit chosen by the policyholder at the inception of the policy.
+                    </p>
+                    <p className="mb-2">
+                      <strong>^</strong> Annualized premium shall be the premium amount payable in a year, excluding taxes, rider premiums, underwriting extra premiums and loadings for modal premiums.
+                    </p>
+                  </div>
+                  <div>
+                    <p className="mb-2">
+                      <strong>#</strong> Total Premiums Paid means total of all the premiums paid under the base product excluding any extra premium and taxes, if collected explicitly.
+                    </p>
+                    <p className="mb-2">
+                      <strong>Tax Benefits:</strong> Tax benefits are as per Income Tax Laws & are subject to change from time to time. Please consult your Tax advisor for details.
+                    </p>
                   </div>
                 </div>
               </div>
 
               {/* Call to Actions */}
               <div className="border-t border-gray-200 pt-6">
-                <div className="flex flex-col sm:flex-row justify-center space-y-3 sm:space-y-0 sm:space-x-4">
-                  <button className="bg-blue-600 text-white px-8 py-3 rounded-lg font-bold hover:bg-blue-700 transition-colors">
-                    Get Quote
+                <div className="flex flex-col sm:flex-row justify-center items-center space-y-3 sm:space-y-0 sm:space-x-4 mb-6">
+                  <button className="bg-blue-600 text-white px-8 py-3 rounded-lg font-bold hover:bg-blue-700 transition-colors flex items-center">
+                    <Calculator className="w-4 h-4 mr-2" />
+                    Calculate Premium
                   </button>
-                  <button className="bg-green-600 text-white px-8 py-3 rounded-lg font-bold hover:bg-green-700 transition-colors">
+                  <button className="bg-green-600 text-white px-8 py-3 rounded-lg font-bold hover:bg-green-700 transition-colors flex items-center">
+                    <CreditCard className="w-4 h-4 mr-2" />
                     Buy Online
                   </button>
-                  <button className="border border-gray-300 text-gray-700 px-8 py-3 rounded-lg font-bold hover:bg-gray-50 transition-colors">
+                  <button 
+                    className="border border-gray-300 text-gray-700 px-8 py-3 rounded-lg font-bold hover:bg-gray-50 transition-colors flex items-center"
+                    onClick={() => {
+                      const link = document.createElement('a');
+                      link.href = '/SBI_Life_Smart_Swadhan_Supreme_Brochure.pdf';
+                      link.download = 'SBI_Life_Smart_Swadhan_Supreme_Brochure.pdf';
+                      document.body.appendChild(link);
+                      link.click();
+                      document.body.removeChild(link);
+                    }}
+                  >
+                    <Download className="w-4 h-4 mr-2" />
                     Download Brochure
                   </button>
+                  <button className="border border-blue-300 text-blue-600 px-8 py-3 rounded-lg font-bold hover:bg-blue-50 transition-colors flex items-center">
+                    <Phone className="w-4 h-4 mr-2" />
+                    Talk to Advisor
+                  </button>
                 </div>
-                <p className="text-center text-xs text-gray-500 mt-4">
-                  *Terms and conditions apply. Please read the policy document carefully before purchasing.
-                </p>
+                <div className="text-center">
+                  <p className="text-xs text-gray-500 mb-2">
+                    For more details on risk factors, terms and conditions please read the sales brochure carefully before concluding a sale.
+                  </p>
+                  <p className="text-xs text-gray-400">
+                    Version: 3D/ver1/09/24/WEB/ENG | *Terms and conditions apply
+                  </p>
+                </div>
               </div>
             </div>
           </div>
