@@ -33,6 +33,7 @@ import {
 } from 'lucide-react';
 import ChatInterface from './ChatInterface';
 
+
 const getDropdownColor = (bgColor) => {
   const colorMap = {
     'bg-red-500': '#ef4444',
@@ -229,7 +230,7 @@ const HomePage = () => {
       title: "Apne iraadon ko, smart guarantee do.",
       subtitle: "SBI Life - Smart Platina Supreme ke guaranteed returns se, karo poore apne iraade, apno se kiye sabhi vaade.",
       bgColor: "from-pink-500 via-red-500 to-purple-800",
-      image: "https://www.sbilife.co.in/content/dam/sbilife/hero-banner/couple-image.jpg"
+      image: "/sbi-online-insurance.webp"
     },
     {
       title: "Shield Your Family's Future",
@@ -982,10 +983,10 @@ const HomePage = () => {
             <div className="flex justify-center lg:justify-end">
               <img 
                 src={heroSlides[currentSlide].image}
-                alt="Insurance"
+                alt="SBI Life Insurance"
                 className="max-w-md w-full h-auto rounded-lg"
                 onError={(e) => {
-                  e.target.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='300' viewBox='0 0 400 300'%3E%3Crect width='400' height='300' fill='%23f3f4f6'/%3E%3Ctext x='200' y='150' font-family='Arial' font-size='16' fill='%236b7280' text-anchor='middle'%3EInsurance Image%3C/text%3E%3C/svg%3E";
+                  e.target.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='300' viewBox='0 0 400 300'%3E%3Crect width='400' height='300' fill='%23003d82'/%3E%3Ctext x='200' y='150' font-family='Arial' font-size='18' font-weight='bold' fill='white' text-anchor='middle'%3ESBI Life%3C/text%3E%3C/svg%3E";
                 }}
               />
             </div>
@@ -1678,17 +1679,29 @@ const HomePage = () => {
                       <span className="bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full text-sm font-medium">Tax Benefits</span>
                     </div>
                   </div>
-                  <div className="text-right ml-6">
-                    <div className="space-y-2">
-                      <button className="w-full bg-blue-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-blue-700 transition-colors">
-                        Calculate Premium
-                      </button>
-                      <button className="w-full bg-green-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-green-700 transition-colors">
-                        Buy Online
-                      </button>
-                    </div>
+                  <div className="ml-6 flex-shrink-0">
+                    <img 
+                      src="/sbi-family-protection.webp" 
+                      alt="SBI Life Family Protection"
+                      className="w-48 h-32 object-cover rounded-lg shadow-md"
+                      onError={(e) => {
+                        e.target.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='192' height='128' viewBox='0 0 192 128'%3E%3Crect width='192' height='128' fill='%23003d82'/%3E%3Ctext x='96' y='70' font-family='Arial' font-size='14' font-weight='bold' fill='white' text-anchor='middle'%3ESBI Life%3C/text%3E%3C/svg%3E";
+                      }}
+                    />
                   </div>
                 </div>
+              </div>
+
+              {/* Smart Swadhan Supreme Banner */}
+              <div className="mb-6 overflow-hidden rounded-lg shadow-lg">
+                <img 
+                  src="/smart-swadhan-banner.png" 
+                  alt="SBI Life Smart Swadhan Supreme - Life Insurance Savings Plan"
+                  className="w-full h-auto object-cover"
+                  onError={(e) => {
+                    e.target.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1170' height='262' viewBox='0 0 1170 262'%3E%3Crect width='1170' height='262' fill='%23003d82'/%3E%3Ctext x='585' y='140' font-family='Arial' font-size='24' font-weight='bold' fill='white' text-anchor='middle'%3ESBI Life - Smart Swadhan Supreme%3C/text%3E%3C/svg%3E";
+                  }}
+                />
               </div>
 
               {/* Features & Advantages */}
@@ -1819,6 +1832,41 @@ const HomePage = () => {
                       <p className="text-sm text-gray-600">
                         <strong>Note:</strong> Total Premiums Paid means total of all the premiums paid under the base product excluding any extra premium and taxes, if collected explicitly.
                       </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Visual Promotional Section */}
+              <div className="mb-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg p-6 text-white relative overflow-hidden">
+                <div className="absolute top-0 right-0 w-32 h-32 opacity-20">
+                  <img 
+                    src="/sbi-sahara-banner.webp" 
+                    alt="SBI Life Insurance" 
+                    className="w-full h-full object-cover rounded"
+                    onError={(e) => {
+                      e.target.style.display = 'none';
+                    }}
+                  />
+                </div>
+                <div className="relative z-10">
+                  <h4 className="text-2xl font-bold mb-3">Secure Your Family's Tomorrow Today!</h4>
+                  <p className="text-blue-100 mb-4">
+                    With SBI Life Smart Swadhan Supreme, get comprehensive life insurance protection 
+                    with guaranteed return of premiums. A perfect blend of security and savings.
+                  </p>
+                  <div className="flex flex-wrap gap-3">
+                    <div className="flex items-center text-sm">
+                      <Shield className="w-4 h-4 mr-2" />
+                      Life Protection
+                    </div>
+                    <div className="flex items-center text-sm">
+                      <Star className="w-4 h-4 mr-2" />
+                      Premium Return
+                    </div>
+                    <div className="flex items-center text-sm">
+                      <Gift className="w-4 h-4 mr-2" />
+                      Tax Benefits
                     </div>
                   </div>
                 </div>

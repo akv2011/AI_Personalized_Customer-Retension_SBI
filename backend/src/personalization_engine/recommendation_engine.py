@@ -13,6 +13,15 @@ from collections import defaultdict # Import defaultdict for chat history
 import re # Import regex for parsing sentiment
 import time # Add time for unique IDs
 import httpx # Import httpx
+import asyncio # Add asyncio for database operations
+
+# Add database service import
+try:
+    from database.database_service import get_database_service
+    DATABASE_AVAILABLE = True
+except ImportError:
+    print("Warning: Database service not available. Running in FAISS-only mode.")
+    DATABASE_AVAILABLE = False
 
 class RecommendationEngine:
     def __init__(self):
@@ -61,6 +70,18 @@ class RecommendationEngine:
         # Stores history as {customer_id: [{"role": "user", "content": "..."}, {"role": "assistant", "content": "..."}]}
         self.chat_history = defaultdict(list)
 
+        # Initialize database service
+        self.db_service = None
+        if DATABASE_AVAILABLE:
+            try:
+                # We'll initialize this asynchronously when needed
+                self.db_service_available = True
+            except Exception as e:
+                print(f"Warning: Failed to initialize database service: {e}")
+                self.db_service_available = False
+        else:
+            self.db_service_available = False
+
     def clean_json_response(self, response_text):
         """Clean OpenAI response text to ensure valid JSON"""
         # Remove potential markdown code fences
@@ -69,8 +90,8 @@ class RecommendationEngine:
         cleaned = cleaned.strip()
         return cleaned
 
-    def process_user_interaction(self, customer_id, interaction_text, interaction_type="chatbot", user_language='en'): # Add user_language
-        """Processes user interaction, stores it in FAISS, gets a personalized response, and updates chat history."""
+    def process_user_interaction(self, customer_id, interaction_text, interaction_type="chatbot", user_language='en'): 
+        """Processes user interaction with enhanced database integration, stores it in FAISS and PostgreSQL, gets a personalized response, and updates chat history."""
         conversation_turn_id = f"{customer_id}_{int(pd.Timestamp.now().timestamp())}"
         
         # Check if this is a Smart Swadhan guidance request
@@ -92,35 +113,58 @@ class RecommendationEngine:
                 "product_focus": "smart_swadhan_supreme"
             }
         
-        # Continue with normal processing for other queries
-        # Embed interaction text (usually document context)
-        embedding = self.embedding_generator.get_embedding(interaction_text, task_type="RETRIEVAL_DOCUMENT") # Specify task type
-        if not embedding:
-            print(f"Error: Failed to generate embedding for interaction: {interaction_text[:100]}...")
-            # Decide how to handle embedding failure - maybe return an error response?
-            return {"error": "Failed to process interaction due to embedding failure."}
-
-        metadata = {
-            "customer_id": customer_id,
-            "conversation_id": "BASIC_CONVO_" + str(int(pd.Timestamp.now().timestamp())), # Basic convo ID for now
-            "timestamp": str(pd.Timestamp.now()),
-            "speaker": "customer",
-            "text": interaction_text,
-            "interaction_type": interaction_type,
-            "outcome": "message_stored" # Basic outcome for now
-        }
-        if self.vector_db_client:
-            success = self.vector_db_client.upsert_embedding(conversation_turn_id, embedding, metadata)
-            if success:
-                print(f"Stored interaction in FAISS: {conversation_turn_id}") # Confirmation log (Updated to FAISS)
-            else:
-                print(f"Failed to store interaction in FAISS: {conversation_turn_id}")
-                # Decide how to handle storage failure
-                return {"error": "Failed to store interaction."}
+        # Store interaction using database service (async) if available
+        if self.db_service_available:
+            try:
+                # Run the async database operation
+                loop = asyncio.new_event_loop()
+                asyncio.set_event_loop(loop)
+                
+                async def store_interaction_async():
+                    if not self.db_service:
+                        self.db_service = await get_database_service()
+                    
+                    return await self.db_service.store_interaction(
+                        customer_id=customer_id,
+                        interaction_text=interaction_text,
+                        interaction_type=interaction_type,
+                        user_language=user_language,
+                        additional_metadata={
+                            "conversation_turn_id": conversation_turn_id,
+                            "timestamp": str(pd.Timestamp.now())
+                        }
+                    )
+                
+                db_result = loop.run_until_complete(store_interaction_async())
+                loop.close()
+                
+                if db_result["success"]:
+                    print(f"✅ Stored interaction in PostgreSQL and FAISS: {conversation_turn_id}")
+                    # If database service returns an LLM response, use it
+                    if 'llm_response' in db_result:
+                        # Add to chat history
+                        self.chat_history[customer_id].append({"role": "user", "content": interaction_text})
+                        self.chat_history[customer_id].append({"role": "assistant", "content": db_result['llm_response']})
+                        self.chat_history[customer_id] = self.chat_history[customer_id][-20:]  # Keep last 20 messages
+                        
+                        return {
+                            "response": db_result['llm_response'],
+                            "conversation_id": db_result.get('conversation_id'),
+                            "customer_id": customer_id,
+                            "success": True,
+                            "source": "database_service"
+                        }
+                else:
+                    print(f"⚠️ Database storage failed: {db_result.get('error', 'Unknown error')}")
+                    # Fall back to FAISS-only storage
+                    self._store_faiss_only(customer_id, interaction_text, interaction_type, conversation_turn_id)
+                    
+            except Exception as e:
+                print(f"⚠️ Database service error: {e}. Falling back to FAISS-only storage.")
+                self._store_faiss_only(customer_id, interaction_text, interaction_type, conversation_turn_id)
         else:
-             print("Warning: Vector DB client not initialized. Interaction not stored.")
-             # Decide how to handle missing DB client
-             return {"error": "Internal server configuration error."}
+            # Fallback to FAISS-only storage
+            self._store_faiss_only(customer_id, interaction_text, interaction_type, conversation_turn_id)
 
         # Add user message to chat history BEFORE getting the response
         # Store the original English query for context
@@ -138,6 +182,36 @@ class RecommendationEngine:
              self.chat_history[customer_id] = self.chat_history[customer_id][-20:]
 
         return response_data
+
+    def _store_faiss_only(self, customer_id, interaction_text, interaction_type, conversation_turn_id):
+        """Fallback method to store interaction only in FAISS"""
+        # Embed interaction text (usually document context)
+        embedding = self.embedding_generator.get_embedding(interaction_text, task_type="RETRIEVAL_DOCUMENT") # Specify task type
+        if not embedding:
+            print(f"Error: Failed to generate embedding for interaction: {interaction_text[:100]}...")
+            return False
+
+        metadata = {
+            "customer_id": customer_id,
+            "conversation_id": "BASIC_CONVO_" + str(int(pd.Timestamp.now().timestamp())), # Basic convo ID for now
+            "timestamp": str(pd.Timestamp.now()),
+            "speaker": "customer",
+            "text": interaction_text,
+            "interaction_type": interaction_type,
+            "outcome": "message_stored" # Basic outcome for now
+        }
+        
+        if self.vector_db_client:
+            success = self.vector_db_client.upsert_embedding(conversation_turn_id, embedding, metadata)
+            if success:
+                print(f"Stored interaction in FAISS: {conversation_turn_id}") # Confirmation log (Updated to FAISS)
+                return True
+            else:
+                print(f"Failed to store interaction in FAISS: {conversation_turn_id}")
+                return False
+        else:
+             print("Warning: Vector DB client not initialized. Interaction not stored.")
+             return False
 
     def get_rag_personalized_response(self, customer_id, user_input_text, user_language='en'): # Add user_language
         """Generates a formatted personalized response using RAG with FAISS, chat history, sentiment analysis, and OpenAI."""
