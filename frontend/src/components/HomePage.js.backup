@@ -1,0 +1,1104 @@
+import React, { useState, useEffect } from 'react';
+import { 
+  Search,
+  Menu,
+  Shield, 
+  MessageCircle,
+  X,
+  ChevronRight,
+  Gift,
+  Heart,
+  Home,
+  Car,
+  GraduationCap,
+  Phone,
+  MapPin,
+  Calculator,
+  Download,
+  CreditCard,
+  Star,
+  Play,
+  Facebook,
+  Twitter,
+  Linkedin,
+  Youtube,
+  Instagram,
+  Users,
+  ArrowRight,
+  Globe,
+  ChevronLeft,
+  UserPlus,
+  ChevronDown,
+  FileText,
+  TrendingUp,
+  User,
+  Building
+} from 'lucide-react';
+import ChatInterface from './ChatInterface';
+
+const getDropdownColor = (bgColor) => {
+  const colorMap = {
+    'bg-red-500': '#ef4444',
+    'bg-red-600': '#dc2626',
+    'bg-blue-600': '#2563eb',
+    'bg-purple-600': '#9333ea',
+    'bg-purple-700': '#7e22ce'
+  };
+  return colorMap[bgColor] || '#2563eb';
+};
+
+const HomePage = () => {
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const [isChatOpen, setIsChatOpen] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isLanguageOpen, setIsLanguageOpen] = useState(false);
+  const [isLoginOpen, setIsLoginOpen] = useState(false);
+  const [selectedLanguage, setSelectedLanguage] = useState('English');
+  const [isJoinUsOpen, setIsJoinUsOpen] = useState(false);
+  const [selectedService, setSelectedService] = useState(null);
+  const [hoveredNavItem, setHoveredNavItem] = useState(null);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [focusedNavItem, setFocusedNavItem] = useState(null);
+  const [currentDropdownItems, setCurrentDropdownItems] = useState([]);
+  const timeoutRef = React.useRef(null);
+  const navRef = React.useRef(null);
+  
+  // Handle keyboard navigation
+  const handleKeyDown = (e, item) => {
+    switch (e.key) {
+      case 'Enter':
+      case ' ':
+        e.preventDefault();
+        setHoveredNavItem(item.name);
+        setFocusedNavItem(item.name);
+        break;
+      case 'Escape':
+        e.preventDefault();
+        setHoveredNavItem(null);
+        setFocusedNavItem(null);
+        break;
+      case 'ArrowDown':
+        e.preventDefault();
+        if (hoveredNavItem === item.name) {
+          // Focus first dropdown item
+          const dropdown = document.querySelector(`[data-dropdown="${item.name}"]`);
+          const firstItem = dropdown?.querySelector('a');
+          firstItem?.focus();
+        }
+        break;
+      case 'Tab':
+        if (hoveredNavItem === item.name && !e.shiftKey) {
+          const dropdown = document.querySelector(`[data-dropdown="${item.name}"]`);
+          const items = dropdown?.querySelectorAll('a');
+          if (items?.length && document.activeElement === items[items.length - 1]) {
+            setHoveredNavItem(null);
+          }
+        }
+        break;
+    }
+  };
+
+  // Auto-slide carousel
+  React.useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % heroSlides.length);
+    }, 5000);
+    return () => clearInterval(interval);
+  }, []);
+
+  // Close dropdowns when clicking outside
+  React.useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (!event.target.closest('.dropdown-container')) {
+        setIsLanguageOpen(false);
+        setIsLoginOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
+  // Close mobile menu when screen size changes
+  React.useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth >= 1024) { // lg breakpoint
+        setIsMobileMenuOpen(false);
+      }
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  const languages = [
+    { code: 'en', name: 'English', flag: '🇺🇸' },
+    { code: 'hi', name: 'हिंदी', flag: '🇮🇳' },
+    { code: 'gu', name: 'ગુજરાતી', flag: '🇮🇳' },
+    { code: 'mr', name: 'मराठी', flag: '🇮🇳' },
+    { code: 'ta', name: 'தமிழ்', flag: '🇮🇳' },
+    { code: 'te', name: 'తెలుగు', flag: '🇮🇳' },
+    { code: 'kn', name: 'ಕನ್ನಡ', flag: '🇮🇳' },
+    { code: 'bn', name: 'বাংলা', flag: '🇮🇳' }
+  ];
+
+  const loginOptions = [
+    { 
+      name: 'Customer Portal', 
+      description: 'View policies, pay premiums, download documents',
+      icon: Users,
+      url: 'https://customer.sbilife.co.in/'
+    },
+    { 
+      name: 'Agent Portal', 
+      description: 'Agent dashboard and tools',
+      icon: Shield,
+      url: 'https://agent.sbilife.co.in/'
+    },
+    { 
+      name: 'Employee Portal', 
+      description: 'Employee access and resources',
+      icon: Heart,
+      url: 'https://employee.sbilife.co.in/'
+    }
+  ];
+
+  const joinUsOptions = [
+    {
+      title: 'Become an Agent',
+      description: 'Start your career as a SBI Life insurance agent and help people secure their future.',
+      benefits: ['Attractive Commission', 'Training Support', 'Career Growth', 'Flexible Working'],
+      icon: Shield,
+      cta: 'Apply Now'
+    },
+    {
+      title: 'Career Opportunities',
+      description: 'Join our team and be part of India\'s leading life insurance company.',
+      benefits: ['Competitive Salary', 'Growth Opportunities', 'Employee Benefits', 'Work-Life Balance'],
+      icon: Heart,
+      cta: 'View Jobs'
+    },
+    {
+      title: 'Business Partnership',
+      description: 'Partner with us to expand your business offerings and serve more customers.',
+      benefits: ['Business Growth', 'Support & Training', 'Brand Association', 'Revenue Sharing'],
+      icon: Users,
+      cta: 'Partner With Us'
+    }
+  ];
+
+  const serviceDetails = {
+    'Nav & Fund Value': {
+      title: 'NAV & Fund Performance',
+      description: 'Check the latest NAV (Net Asset Value) and fund performance for your ULIP policies.',
+      features: ['Real-time NAV updates', 'Fund performance charts', 'Historical data', 'Fund switching options'],
+      url: 'https://www.sbilife.co.in/en/nav-fund-performance'
+    },
+    'Pay Premium': {
+      title: 'Premium Payment',
+      description: 'Pay your insurance premiums easily and securely online.',
+      features: ['Multiple payment options', 'Auto-pay setup', 'Payment history', 'SMS/Email receipts'],
+      url: 'https://www.sbilife.co.in/en/pay-premium'
+    },
+    'Tools & Calculator': {
+      title: 'Insurance Calculators',
+      description: 'Use our advanced calculators to plan your insurance needs and investments.',
+      features: ['Premium calculator', 'ULIP calculator', 'Retirement planner', 'Human Life Value calculator'],
+      url: 'https://www.sbilife.co.in/en/tools-calculators'
+    },
+    'Download Forms': {
+      title: 'Forms & Documents',
+      description: 'Download important forms and documents for your insurance policies.',
+      features: ['Policy forms', 'Claim forms', 'Service request forms', 'Product brochures'],
+      url: 'https://www.sbilife.co.in/en/download-centre'
+    }
+  };
+  
+  const heroSlides = [
+    {
+      title: "Apne iraadon ko, smart guarantee do.",
+      subtitle: "SBI Life - Smart Platina Supreme ke guaranteed returns se, karo poore apne iraade, apno se kiye sabhi vaade.",
+      bgColor: "from-blue-600 via-blue-700 to-blue-800",
+      image: "https://www.sbilife.co.in/content/dam/sbilife/hero-banner/couple-image.jpg",
+      cta: "Know More",
+      ctaLink: "#smart-platina"
+    },
+    {
+      title: "Security ka naam hai, SBI Life Smart Humsafar",
+      subtitle: "Aapke saath nibhaye yeh humsafar, jindagi bhar. Guaranteed returns ke saath family ko mile comprehensive protection.",
+      bgColor: "from-green-600 via-green-700 to-green-800",
+      image: "https://www.sbilife.co.in/content/dam/sbilife/hero-banner/family-protection.jpg",
+      cta: "Know More",
+      ctaLink: "#smart-humsafar"
+    },
+    {
+      title: "Retirement ki worry ko kaho goodbye",
+      subtitle: "SBI Life Saral Pension ke saath secure karo apna future. Guaranteed income for life.",
+      bgColor: "from-purple-600 via-purple-700 to-purple-800",
+      image: "https://www.sbilife.co.in/content/dam/sbilife/hero-banner/retirement-planning.jpg",
+      cta: "Know More",
+      ctaLink: "#saral-pension"
+    },
+    {
+      title: "Child ke dreams ko karo achieve",
+      subtitle: "SBI Life Smart Champ ke saath secure karo bachhe ka future. Education ke liye guaranteed fund.",
+      bgColor: "from-orange-500 via-red-500 to-pink-700",
+      image: "https://www.sbilife.co.in/content/dam/sbilife/hero-banner/child-education.jpg",
+      cta: "Know More",
+      ctaLink: "#smart-champ"
+    }
+  ];
+
+  const nextSlide = () => {
+    setCurrentSlide((prev) => (prev + 1) % heroSlides.length);
+  };
+
+  const prevSlide = () => {
+    setCurrentSlide((prev) => (prev - 1 + heroSlides.length) % heroSlides.length);
+  };
+
+  const navigationItems = [
+    {
+      name: 'LEARN',
+      subtitle: 'Knowledge is power',
+      href: '#',
+      dropdownItems: [
+        { name: 'Learn About Insurance', href: '#' },
+        { name: 'Need Assessment', href: '#' },
+        { name: 'Tools & Calculators', href: '#' },
+        { name: 'Partners', href: '#' },
+        { name: 'FAQs', href: '#' },
+        { name: 'Podcasts', href: '#' },
+        { name: 'Knowledge Centre', href: '#' },
+      ],
+    },
+    {
+      name: 'PRODUCTS',
+      subtitle: 'Secure your future',
+      href: '#',
+      dropdownItems: [
+        { name: 'Individual Life Insurance Plans', href: '#' },
+        { name: 'Group Insurance Plans', href: '#' },
+        { name: 'Tools & Calculators', href: '#' },
+        { name: 'Need Assessment', href: '#' },
+      ],
+    },
+    {
+      name: 'SERVICES',
+      subtitle: 'We are here to help',
+      href: '#',
+      dropdownItems: [
+        { name: 'Services', href: '#' },
+        { name: 'Claims and Maturity', href: '#' },
+        { name: 'NRI Corner', href: '#' },
+        { name: 'Download Centre', href: '#' },
+        { name: 'NAV & Fund Performance', href: '#' },
+        { name: 'FAQs', href: '#' },
+      ],
+    },
+    {
+      name: 'ABOUT',
+      subtitle: 'Our story and values',
+      href: '#',
+      dropdownItems: [
+        { name: 'About Us', href: '#' },
+        { name: 'Key Milestones', href: '#' },
+        { name: 'Awards, CSR, Media Centre, Investor Relations, Careers, LifeVerse', href: '#' },
+      ],
+    },
+    {
+      name: 'CONTACT US',
+      subtitle: 'Get in touch',
+      href: '#',
+      dropdownItems: [
+        { name: 'Contact Us', href: '#' },
+      ],
+    },
+  ];
+
+  // Close dropdowns when clicking outside
+  React.useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (!event.target.closest('.dropdown-container')) {
+        setIsLanguageOpen(false);
+        setIsLoginOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
+  // Close mobile menu when screen size changes
+  React.useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth >= 1024) { // lg breakpoint
+        setIsMobileMenuOpen(false);
+      }
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  const languages = [
+    { code: 'en', name: 'English', flag: '🇺🇸' },
+    { code: 'hi', name: 'हिंदी', flag: '🇮🇳' },
+    { code: 'gu', name: 'ગુજરાતી', flag: '🇮🇳' },
+    { code: 'mr', name: 'मराठी', flag: '🇮🇳' },
+    { code: 'ta', name: 'தமிழ்', flag: '🇮🇳' },
+    { code: 'te', name: 'తెలుగు', flag: '🇮🇳' },
+    { code: 'kn', name: 'ಕನ್ನಡ', flag: '🇮🇳' },
+    { code: 'bn', name: 'বাংলা', flag: '🇮🇳' }
+  ];
+
+  const loginOptions = [
+    { 
+      name: 'Customer Portal', 
+      description: 'View policies, pay premiums, download documents',
+      icon: Users,
+      url: 'https://customer.sbilife.co.in/'
+    },
+    { 
+      name: 'Agent Portal', 
+      description: 'Agent dashboard and tools',
+      icon: Shield,
+      url: 'https://agent.sbilife.co.in/'
+    },
+    { 
+      name: 'Employee Portal', 
+      description: 'Employee access and resources',
+      icon: Heart,
+      url: 'https://employee.sbilife.co.in/'
+    }
+  ];
+
+  const joinUsOptions = [
+    {
+      title: 'Become an Agent',
+      description: 'Start your career as a SBI Life insurance agent and help people secure their future.',
+      benefits: ['Attractive Commission', 'Training Support', 'Career Growth', 'Flexible Working'],
+      icon: Shield,
+      cta: 'Apply Now'
+    },
+    {
+      title: 'Career Opportunities',
+      description: 'Join our team and be part of India\'s leading life insurance company.',
+      benefits: ['Competitive Salary', 'Growth Opportunities', 'Employee Benefits', 'Work-Life Balance'],
+      icon: Heart,
+      cta: 'View Jobs'
+    },
+    {
+      title: 'Business Partnership',
+      description: 'Partner with us to expand your business offerings and serve more customers.',
+      benefits: ['Business Growth', 'Support & Training', 'Brand Association', 'Revenue Sharing'],
+      icon: Users,
+      cta: 'Partner With Us'
+    }
+  ];
+
+  const serviceDetails = {
+    'Nav & Fund Value': {
+      title: 'NAV & Fund Performance',
+      description: 'Check the latest NAV (Net Asset Value) and fund performance for your ULIP policies.',
+      features: ['Real-time NAV updates', 'Fund performance charts', 'Historical data', 'Fund switching options'],
+      url: 'https://www.sbilife.co.in/en/nav-fund-performance'
+    },
+    'Pay Premium': {
+      title: 'Premium Payment',
+      description: 'Pay your insurance premiums easily and securely online.',
+      features: ['Multiple payment options', 'Auto-pay setup', 'Payment history', 'SMS/Email receipts'],
+      url: 'https://www.sbilife.co.in/en/pay-premium'
+    },
+    'Tools & Calculator': {
+      title: 'Insurance Calculators',
+      description: 'Use our advanced calculators to plan your insurance needs and investments.',
+      features: ['Premium calculator', 'ULIP calculator', 'Retirement planner', 'Human Life Value calculator'],
+      url: 'https://www.sbilife.co.in/en/tools-calculators'
+    },
+    'Download Forms': {
+      title: 'Forms & Documents',
+      description: 'Download important forms and documents for your insurance policies.',
+      features: ['Policy forms', 'Claim forms', 'Service request forms', 'Product brochures'],
+      url: 'https://www.sbilife.co.in/en/download-centre'
+    }
+  };
+  
+  const heroSlides = [
+    {
+      title: "Apne iraadon ko, smart guarantee do.",
+      subtitle: "SBI Life - Smart Platina Supreme ke guaranteed returns se, karo poore apne iraade, apno se kiye sabhi vaade.",
+      bgColor: "from-blue-600 via-blue-700 to-blue-800",
+      image: "https://www.sbilife.co.in/content/dam/sbilife/hero-banner/couple-image.jpg",
+      cta: "Know More",
+      ctaLink: "#smart-platina"
+    },
+    {
+      title: "Security ka naam hai, SBI Life Smart Humsafar",
+      subtitle: "Aapke saath nibhaye yeh humsafar, jindagi bhar. Guaranteed returns ke saath family ko mile comprehensive protection.",
+      bgColor: "from-green-600 via-green-700 to-green-800",
+      image: "https://www.sbilife.co.in/content/dam/sbilife/hero-banner/family-protection.jpg",
+      cta: "Know More",
+      ctaLink: "#smart-humsafar"
+    },
+    {
+      title: "Retirement ki worry ko kaho goodbye",
+      subtitle: "SBI Life Saral Pension ke saath secure karo apna future. Guaranteed income for life.",
+      bgColor: "from-purple-600 via-purple-700 to-purple-800",
+      image: "https://www.sbilife.co.in/content/dam/sbilife/hero-banner/retirement-planning.jpg",
+      cta: "Know More",
+      ctaLink: "#saral-pension"
+    },
+    {
+      title: "Child ke dreams ko karo achieve",
+      subtitle: "SBI Life Smart Champ ke saath secure karo bachhe ka future. Education ke liye guaranteed fund.",
+      bgColor: "from-orange-500 via-red-500 to-pink-700",
+      image: "https://www.sbilife.co.in/content/dam/sbilife/hero-banner/child-education.jpg",
+      cta: "Know More",
+      ctaLink: "#smart-champ"
+    }
+  ];
+
+  const nextSlide = () => {
+    setCurrentSlide((prev) => (prev + 1) % heroSlides.length);
+  };
+
+  const prevSlide = () => {
+    setCurrentSlide((prev) => (prev - 1 + heroSlides.length) % heroSlides.length);
+  };
+
+  // Close dropdowns when clicking outside
+  React.useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (!event.target.closest('.dropdown-container')) {
+        setIsLanguageOpen(false);
+        setIsLoginOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
+  // Close mobile menu when screen size changes
+  React.useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth >= 1024) { // lg breakpoint
+        setIsMobileMenuOpen(false);
+      }
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  const languages = [
+    { code: 'en', name: 'English', flag: '🇺🇸' },
+    { code: 'hi', name: 'हिंदी', flag: '🇮🇳' },
+    { code: 'gu', name: 'ગુજરાતી', flag: '🇮🇳' },
+    { code: 'mr', name: 'मराठी', flag: '🇮🇳' },
+    { code: 'ta', name: 'தமிழ்', flag: '🇮🇳' },
+    { code: 'te', name: 'తెలుగు', flag: '🇮🇳' },
+    { code: 'kn', name: 'ಕನ್ನಡ', flag: '🇮🇳' },
+    { code: 'bn', name: 'বাংলা', flag: '🇮🇳' }
+  ];
+
+  const loginOptions = [
+    { 
+      name: 'Customer Portal', 
+      description: 'View policies, pay premiums, download documents',
+      icon: Users,
+      url: 'https://customer.sbilife.co.in/'
+    },
+    { 
+      name: 'Agent Portal', 
+      description: 'Agent dashboard and tools',
+      icon: Shield,
+      url: 'https://agent.sbilife.co.in/'
+    },
+    { 
+      name: 'Employee Portal', 
+      description: 'Employee access and resources',
+      icon: Heart,
+      url: 'https://employee.sbilife.co.in/'
+    }
+  ];
+
+  const joinUsOptions = [
+    {
+      title: 'Become an Agent',
+      description: 'Start your career as a SBI Life insurance agent and help people secure their future.',
+      benefits: ['Attractive Commission', 'Training Support', 'Career Growth', 'Flexible Working'],
+      icon: Shield,
+      cta: 'Apply Now'
+    },
+    {
+      title: 'Career Opportunities',
+      description: 'Join our team and be part of India\'s leading life insurance company.',
+      benefits: ['Competitive Salary', 'Growth Opportunities', 'Employee Benefits', 'Work-Life Balance'],
+      icon: Heart,
+      cta: 'View Jobs'
+    },
+    {
+      title: 'Business Partnership',
+      description: 'Partner with us to expand your business offerings and serve more customers.',
+      benefits: ['Business Growth', 'Support & Training', 'Brand Association', 'Revenue Sharing'],
+      icon: Users,
+      cta: 'Partner With Us'
+    }
+  ];
+
+  const serviceDetails = {
+    'Nav & Fund Value': {
+      title: 'NAV & Fund Performance',
+      description: 'Check the latest NAV (Net Asset Value) and fund performance for your ULIP policies.',
+      features: ['Real-time NAV updates', 'Fund performance charts', 'Historical data', 'Fund switching options'],
+      url: 'https://www.sbilife.co.in/en/nav-fund-performance'
+    },
+    'Pay Premium': {
+      title: 'Premium Payment',
+      description: 'Pay your insurance premiums easily and securely online.',
+      features: ['Multiple payment options', 'Auto-pay setup', 'Payment history', 'SMS/Email receipts'],
+      url: 'https://www.sbilife.co.in/en/pay-premium'
+    },
+    'Tools & Calculator': {
+      title: 'Insurance Calculators',
+      description: 'Use our advanced calculators to plan your insurance needs and investments.',
+      features: ['Premium calculator', 'ULIP calculator', 'Retirement planner', 'Human Life Value calculator'],
+      url: 'https://www.sbilife.co.in/en/tools-calculators'
+    },
+    'Download Forms': {
+      title: 'Forms & Documents',
+      description: 'Download important forms and documents for your insurance policies.',
+      features: ['Policy forms', 'Claim forms', 'Service request forms', 'Product brochures'],
+      url: 'https://www.sbilife.co.in/en/download-centre'
+    }
+  };
+  
+  const heroSlides = [
+    {
+      title: "Apne iraadon ko, smart guarantee do.",
+      subtitle: "SBI Life - Smart Platina Supreme ke guaranteed returns se, karo poore apne iraade, apno se kiye sabhi vaade.",
+      bgColor: "from-blue-600 via-blue-700 to-blue-800",
+      image: "https://www.sbilife.co.in/content/dam/sbilife/hero-banner/couple-image.jpg",
+      cta: "Know More",
+      ctaLink: "#smart-platina"
+    },
+    {
+      title: "Security ka naam hai, SBI Life Smart Humsafar",
+      subtitle: "Aapke saath nibhaye yeh humsafar, jindagi bhar. Guaranteed returns ke saath family ko mile comprehensive protection.",
+      bgColor: "from-green-600 via-green-700 to-green-800",
+      image: "https://www.sbilife.co.in/content/dam/sbilife/hero-banner/family-protection.jpg",
+      cta: "Know More",
+      ctaLink: "#smart-humsafar"
+    },
+    {
+      title: "Retirement ki worry ko kaho goodbye",
+      subtitle: "SBI Life Saral Pension ke saath secure karo apna future. Guaranteed income for life.",
+      bgColor: "from-purple-600 via-purple-700 to-purple-800",
+      image: "https://www.sbilife.co.in/content/dam/sbilife/hero-banner/retirement-planning.jpg",
+      cta: "Know More",
+      ctaLink: "#saral-pension"
+    },
+    {
+      title: "Child ke dreams ko karo achieve",
+      subtitle: "SBI Life Smart Champ ke saath secure karo bachhe ka future. Education ke liye guaranteed fund.",
+      bgColor: "from-orange-500 via-red-500 to-pink-700",
+      image: "https://www.sbilife.co.in/content/dam/sbilife/hero-banner/child-education.jpg",
+      cta: "Know More",
+      ctaLink: "#smart-champ"
+    }
+  ];
+
+  const nextSlide = () => {
+    setCurrentSlide((prev) => (prev + 1) % heroSlides.length);
+  };
+
+  const prevSlide = () => {
+    setCurrentSlide((prev) => (prev - 1 + heroSlides.length) % heroSlides.length);
+  };
+
+  // Close dropdowns when clicking outside
+  React.useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (!event.target.closest('.dropdown-container')) {
+        setIsLanguageOpen(false);
+        setIsLoginOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
+  // Close mobile menu when screen size changes
+  React.useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth >= 1024) { // lg breakpoint
+        setIsMobileMenuOpen(false);
+      }
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  const languages = [
+    { code: 'en', name: 'English', flag: '🇺🇸' },
+    { code: 'hi', name: 'हिंदी', flag: '🇮🇳' },
+    { code: 'gu', name: 'ગુજરાતી', flag: '🇮🇳' },
+    { code: 'mr', name: 'मराठी', flag: '🇮🇳' },
+    { code: 'ta', name: 'தமிழ்', flag: '🇮🇳' },
+    { code: 'te', name: 'తెలుగు', flag: '🇮🇳' },
+    { code: 'kn', name: 'ಕನ್ನಡ', flag: '🇮🇳' },
+    { code: 'bn', name: 'বাংলা', flag: '🇮🇳' }
+  ];
+
+  const loginOptions = [
+    { 
+      name: 'Customer Portal', 
+      description: 'View policies, pay premiums, download documents',
+      icon: Users,
+      url: 'https://customer.sbilife.co.in/'
+    },
+    { 
+      name: 'Agent Portal', 
+      description: 'Agent dashboard and tools',
+      icon: Shield,
+      url: 'https://agent.sbilife.co.in/'
+    },
+    { 
+      name: 'Employee Portal', 
+      description: 'Employee access and resources',
+      icon: Heart,
+      url: 'https://employee.sbilife.co.in/'
+    }
+  ];
+
+  const joinUsOptions = [
+    {
+      title: 'Become an Agent',
+      description: 'Start your career as a SBI Life insurance agent and help people secure their future.',
+      benefits: ['Attractive Commission', 'Training Support', 'Career Growth', 'Flexible Working'],
+      icon: Shield,
+      cta: 'Apply Now'
+    },
+    {
+      title: 'Career Opportunities',
+      description: 'Join our team and be part of India\'s leading life insurance company.',
+      benefits: ['Competitive Salary', 'Growth Opportunities', 'Employee Benefits', 'Work-Life Balance'],
+      icon: Heart,
+      cta: 'View Jobs'
+    },
+    {
+      title: 'Business Partnership',
+      description: 'Partner with us to expand your business offerings and serve more customers.',
+      benefits: ['Business Growth', 'Support & Training', 'Brand Association', 'Revenue Sharing'],
+      icon: Users,
+      cta: 'Partner With Us'
+    }
+  ];
+
+  const serviceDetails = {
+    'Nav & Fund Value': {
+      title: 'NAV & Fund Performance',
+      description: 'Check the latest NAV (Net Asset Value) and fund performance for your ULIP policies.',
+      features: ['Real-time NAV updates', 'Fund performance charts', 'Historical data', 'Fund switching options'],
+      url: 'https://www.sbilife.co.in/en/nav-fund-performance'
+    },
+    'Pay Premium': {
+      title: 'Premium Payment',
+      description: 'Pay your insurance premiums easily and securely online.',
+      features: ['Multiple payment options', 'Auto-pay setup', 'Payment history', 'SMS/Email receipts'],
+      url: 'https://www.sbilife.co.in/en/pay-premium'
+    },
+    'Tools & Calculator': {
+      title: 'Insurance Calculators',
+      description: 'Use our advanced calculators to plan your insurance needs and investments.',
+      features: ['Premium calculator', 'ULIP calculator', 'Retirement planner', 'Human Life Value calculator'],
+      url: 'https://www.sbilife.co.in/en/tools-calculators'
+    },
+    'Download Forms': {
+      title: 'Forms & Documents',
+      description: 'Download important forms and documents for your insurance policies.',
+      features: ['Policy forms', 'Claim forms', 'Service request forms', 'Product brochures'],
+      url: 'https://www.sbilife.co.in/en/download-centre'
+    }
+  };
+  
+  const heroSlides = [
+    {
+      title: "Apne iraadon ko, smart guarantee do.",
+      subtitle: "SBI Life - Smart Platina Supreme ke guaranteed returns se, karo poore apne iraade, apno se kiye sabhi vaade.",
+      bgColor: "from-blue-600 via-blue-700 to-blue-800",
+      image: "https://www.sbilife.co.in/content/dam/sbilife/hero-banner/couple-image.jpg",
+      cta: "Know More",
+      ctaLink: "#smart-platina"
+    },
+    {
+      title: "Security ka naam hai, SBI Life Smart Humsafar",
+      subtitle: "Aapke saath nibhaye yeh humsafar, jindagi bhar. Guaranteed returns ke saath family ko mile comprehensive protection.",
+      bgColor: "from-green-600 via-green-700 to-green-800",
+      image: "https://www.sbilife.co.in/content/dam/sbilife/hero-banner/family-protection.jpg",
+      cta: "Know More",
+      ctaLink: "#smart-humsafar"
+    },
+    {
+      title: "Retirement ki worry ko kaho goodbye",
+      subtitle: "SBI Life Saral Pension ke saath secure karo apna future. Guaranteed income for life.",
+      bgColor: "from-purple-600 via-purple-700 to-purple-800",
+      image: "https://www.sbilife.co.in/content/dam/sbilife/hero-banner/retirement-planning.jpg",
+      cta: "Know More",
+      ctaLink: "#saral-pension"
+    },
+    {
+      title: "Child ke dreams ko karo achieve",
+      subtitle: "SBI Life Smart Champ ke saath secure karo bachhe ka future. Education ke liye guaranteed fund.",
+      bgColor: "from-orange-500 via-red-500 to-pink-700",
+      image: "https://www.sbilife.co.in/content/dam/sbilife/hero-banner/child-education.jpg",
+      cta: "Know More",
+      ctaLink: "#smart-champ"
+    }
+  ];
+
+  const nextSlide = () => {
+    setCurrentSlide((prev) => (prev + 1) % heroSlides.length);
+  };
+
+  const prevSlide = () => {
+    setCurrentSlide((prev) => (prev - 1 + heroSlides.length) % heroSlides.length);
+  };
+
+  // Handle keyboard navigation
+  const handleKeyDown = (e, item) => {
+    switch (e.key) {
+      case 'Enter':
+      case ' ':
+        e.preventDefault();
+        setHoveredNavItem(item.name);
+        setFocusedNavItem(item.name);
+        break;
+      case 'Escape':
+        e.preventDefault();
+        setHoveredNavItem(null);
+        setFocusedNavItem(null);
+        break;
+      case 'ArrowDown':
+        e.preventDefault();
+        if (hoveredNavItem === item.name) {
+          // Focus first dropdown item
+          const dropdown = document.querySelector(`[data-dropdown="${item.name}"]`);
+          const firstItem = dropdown?.querySelector('a');
+          firstItem?.focus();
+        }
+        break;
+      case 'Tab':
+        if (hoveredNavItem === item.name && !e.shiftKey) {
+          const dropdown = document.querySelector(`[data-dropdown="${item.name}"]`);
+          const items = dropdown?.querySelectorAll('a');
+          if (items?.length && document.activeElement === items[items.length - 1]) {
+            setHoveredNavItem(null);
+          }
+        }
+        break;
+    }
+  };
+
+  // Join Us Modal
+  {isJoinUsOpen && (
+    <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+      <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+        <div className="p-6 border-b border-gray-200 flex justify-between items-center">
+          <h2 className="text-2xl font-bold text-gray-900">Join the SBI Life Family</h2>
+          <button
+            onClick={() => setIsJoinUsOpen(false)}
+            className="text-gray-400 hover:text-gray-600"
+          >
+            <X className="w-6 h-6" />
+          </button>
+        </div>
+        <div className="p-6">
+          <p className="text-gray-600 mb-8 text-center">
+            Discover exciting opportunities to grow with India's leading life insurance company
+          </p>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {joinUsOptions.map((option, index) => (
+              <div key={index} className="border border-gray-200 rounded-lg p-6 hover:shadow-lg transition-shadow">
+                <div className="text-center mb-4">
+                  <div className="inline-flex items-center justify-center w-16 h-16 bg-blue-100 rounded-full mb-4">
+                    <option.icon className="w-8 h-8 text-blue-600" />
+                  </div>
+                  <h3 className="text-xl font-bold text-gray-900 mb-2">{option.title}</h3>
+                  <p className="text-gray-600 mb-4">{option.description}</p>
+                </div>
+                <div className="mb-6">
+                  <h4 className="font-semibold text-gray-800 mb-2">Benefits:</h4>
+                  <ul className="space-y-1">
+                    {option.benefits.map((benefit, idx) => (
+                      <li key={idx} className="flex items-center text-sm text-gray-600">
+                        <span className="w-2 h-2 bg-green-500 rounded-full mr-2"></span>
+                        {benefit}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+                <button className="w-full bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 transition-colors">
+                  {option.cta}
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  )}
+
+  // Service Details Modal
+  {selectedService && (
+    <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+      <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+        <div className="p-6 border-b border-gray-200 flex justify-between items-center">
+          <h2 className="text-2xl font-bold text-gray-900">{serviceDetails[selectedService]?.title}</h2>
+          <button
+            onClick={() => setSelectedService(null)}
+            className="text-gray-400 hover:text-gray-600"
+          >
+            <X className="w-6 h-6" />
+          </button>
+        </div>
+        <div className="p-6">
+          <p className="text-gray-600 mb-6">{serviceDetails[selectedService]?.description}</p>
+          <div className="mb-6">
+            <h3 className="text-lg font-semibold text-gray-800 mb-3">Features & Benefits:</h3>
+            <ul className="space-y-2">
+              {serviceDetails[selectedService]?.features.map((feature, index) => (
+                <li key={index} className="flex items-center text-gray-600">
+                  <span className="w-2 h-2 bg-blue-500 rounded-full mr-3"></span>
+                  {feature}
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div className="flex space-x-4">
+            <button
+              onClick={() => {
+                window.open(serviceDetails[selectedService]?.url, '_blank');
+              }}
+              className="flex-1 bg-blue-600 text-white py-3 px-6 rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center"
+            >
+              <span>Access Service</span>
+              <ArrowRight className="w-4 h-4 ml-2" />
+            </button>
+            <button
+              onClick={() => setSelectedService(null)}
+              className="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  )}
+
+  {/* Mobile Menu */}
+  {isMobileMenuOpen && (
+    <div className="fixed inset-0 bg-black bg-opacity-50 z-50 lg:hidden">
+      <div 
+        className="fixed top-0 left-0 w-80 h-full bg-white shadow-xl overflow-y-auto"
+        role="dialog"
+        aria-modal="true"
+        aria-label="Navigation menu"
+      >
+        <div className="p-4">
+          <div className="flex justify-between items-center mb-6">
+            <img 
+              src="/SBI_Logo_original.png" 
+              alt="SBI Life"
+              className="h-8"
+            />
+            <button 
+              onClick={() => setIsMobileMenuOpen(false)}
+              className="p-2 text-gray-500 hover:text-gray-700"
+              aria-label="Close menu"
+            >
+              <X className="w-6 h-6" />
+            </button>
+          </div>
+
+          <div className="space-y-2">
+            {navigationItems.map((item) => (
+              <div key={item.name} className="border-b border-gray-200 last:border-0">
+                <button 
+                  onClick={() => setHoveredNavItem(hoveredNavItem === item.name ? null : item.name)}
+                  className="flex items-center justify-between w-full py-3 text-left"
+                  aria-expanded={hoveredNavItem === item.name}
+                >
+                  <div>
+                    <span className="block font-medium text-gray-900">{item.name}</span>
+                    <span className="text-xs text-gray-500">{item.subtitle}</span>
+                  </div>
+                  <ChevronDown 
+                    className={`w-5 h-5 text-gray-400 transition-transform ${
+                      hoveredNavItem === item.name ? 'rotate-180' : ''
+                    }`}
+                  />
+                </button>
+
+                <div
+                  className={`${
+                    hoveredNavItem === item.name
+                      ? 'max-h-[1000px] opacity-100 visible'
+                      : 'max-h-0 opacity-0 invisible'
+                  } transition-all duration-300 ease-in-out overflow-hidden`}
+                >
+                  <div className="py-3 px-4 space-y-3">
+                    {item.dropdownItems.map((dropdownItem, idx) => (
+                      <a
+                        key={idx}
+                        href={dropdownItem.href}
+                        className="block hover:text-blue-600"
+                      >
+                        <div className="font-medium text-gray-900">{dropdownItem.title}</div>
+                        <div className="text-sm text-gray-500">{dropdownItem.description}</div>
+                      </a>
+                    ))}
+                  </div>
+                  <div className="py-3 px-4 bg-gray-50 border-t border-gray-100">
+                    <a 
+                      href={item.href}
+                      className="text-sm text-blue-600 hover:text-blue-700 font-medium flex items-center"
+                    >
+                      View All {item.name} Resources
+                      <ArrowRight className="w-4 h-4 ml-1" />
+                    </a>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Mobile Quick Links */}
+          <div className="mt-6 pt-6 border-t border-gray-200">
+            <div className="text-xs font-semibold text-gray-500 uppercase mb-4">Quick Links</div>
+            <div className="space-y-3">
+              {quickLinks.map((link, index) => (
+                <button
+                  key={index}
+                  className="flex items-center w-full text-left text-gray-600 hover:text-blue-600"
+                  onClick={() => {
+                    setSelectedService(link);
+                    setIsMobileMenuOpen(false);
+                  }}
+                >
+                  {index === 0 && <Calculator className="w-4 h-4 mr-3" />}
+                  {index === 1 && <CreditCard className="w-4 h-4 mr-3" />}
+                  {index === 2 && <Calculator className="w-4 h-4 mr-3" />}
+                  {index === 3 && <Download className="w-4 h-4 mr-3" />}
+                  {link}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  )}
+
+  return (
+    <div className="min-h-screen bg-white">
+      {/* Top Notification Banner */}
+      <div className="bg-red-600 text-white text-center py-2 text-sm">
+        <div className="max-w-7xl mx-auto px-4 flex items-center justify-center">
+          <span className="mr-2">📢</span>
+          <span>Important: Beware of fraudulent calls/SMS. SBI Life never asks for OTP/PIN. Report suspicious activity immediately.</span>
+          <button className="ml-4 hover:underline">Learn More</button>
+        </div>
+      </div>
+
+      {/* Header */}
+      <header className="sticky top-0 z-50">
+        <nav 
+          className="bg-purple-700 text-white relative" 
+          onMouseLeave={() => {
+            // Assumes handleMouseLeave() is an existing function in the component scope.
+            if (typeof handleMouseLeave === 'function') {
+              handleMouseLeave();
+            }
+          }}
+        >
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex justify-around items-stretch h-20">
+              {navigationItems.map((item) => (
+                <div
+                  key={item.name}
+                  onMouseEnter={() => {
+                    // Assumes handleMouseEnter(item) is an existing function in the component scope.
+                    if (typeof handleMouseEnter === 'function') {
+                      handleMouseEnter(item);
+                    }
+                  }}
+                  className={`flex-grow flex flex-col items-center justify-center px-2 py-2 cursor-pointer group relative transition-colors duration-150 ${
+                    hoveredNavItem === item.name ? 'bg-[#261f80]' : 'hover:bg-purple-600' 
+                  }`}
+                >
+                  <div className="text-center">
+                    <div className="text-lg font-semibold group-hover:text-white">{item.name}</div>
+                    {item.subtitle && (
+                      <div className="text-xs text-purple-200 group-hover:text-gray-100 mt-1">{item.subtitle}</div>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Single Blue Dropdown Bar */}
+          {hoveredNavItem && currentDropdownItems && currentDropdownItems.length > 0 && (
+            // Assumes hoveredNavItem and currentDropdownItems are existing state variables.
+            <div 
+              className="absolute left-0 right-0 top-full z-20" // Positioned below nav
+              onMouseEnter={() => {
+                // Keeps dropdown open when mouse moves from nav item to dropdown.
+                // Assumes handleMouseEnter, hoveredNavItem, navigationItems are in scope.
+                if (typeof handleMouseEnter === 'function' && hoveredNavItem) {
+                  const activeItem = navigationItems.find(navItem => navItem.name === hoveredNavItem);
+                  if (activeItem) {
+                    handleMouseEnter(activeItem);
+                  }
+                }
+              }}
+              // onMouseLeave for the dropdown is implicitly handled by the parent nav's onMouseLeave
+            >
+              <div className="max-w-7xl mx-auto"> {/* Constrains blue bar to content width */}
+                <div className="bg-[#261f80] shadow-lg"> {/* Blue background - DO NOT CHANGE */}
+                  <div className="px-4 sm:px-6 lg:px-8"> {/* Padding for link container */}
+                    <div className="flex overflow-x-auto whitespace-nowrap py-3 space-x-6">
+                      {currentDropdownItems.map((subItem, index) => (
+                        <a
+                          key={index}
+                          href={subItem.href || '#'}
+                          className="text-white hover:text-gray-300 py-2 text-base" // Increased font size
+                        >
+                          {subItem.name}
+                        </a>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+        </nav>
+      </header>
+
+      {/* Main content and other components go here */}
+    </div>
+  );
+};
+
+export default HomePage;

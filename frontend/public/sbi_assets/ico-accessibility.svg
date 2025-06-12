@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="54.522" height="54.522" viewBox="0 0 54.522 54.522">
+  <defs>
+    <linearGradient id="linear-gradient" x1="0.071" y1="0.5" x2="0.917" y2="0.5" gradientUnits="objectBoundingBox">
+      <stop offset="0" stop-color="#d60d47"/>
+      <stop offset="1" stop-color="#291f75"/>
+    </linearGradient>
+  </defs>
+  <g id="Group_9551" data-name="Group 9551" transform="translate(-3579.739 -642.739)">
+    <g id="noun-accessibility-4501929" transform="translate(3577.739 640.739)">
+      <path id="Path_1366" data-name="Path 1366" d="M29.261,2A27.261,27.261,0,1,0,56.522,29.261,27.261,27.261,0,0,0,29.261,2Zm0,50.161a22.9,22.9,0,1,1,22.9-22.9,22.9,22.9,0,0,1-22.9,22.9Z" transform="translate(0 0)" fill="#2a2076"/>
+    </g>
+    <g id="noun-accessibility-4501929-2" data-name="noun-accessibility-4501929" transform="translate(3577.739 640.738)">
+      <path id="Path_1366-2" data-name="Path 1366" d="M29.261,19.447A4.362,4.362,0,1,0,24.9,15.085,4.362,4.362,0,0,0,29.261,19.447Zm11.682.022L29.531,21.13a1.878,1.878,0,0,1-.539,0L17.58,19.47a2.181,2.181,0,1,0-.628,4.317l7.024,1.022a.537.537,0,0,1,.459.531v8.415l-.186.86-4.5,9.9a2.181,2.181,0,0,0,3.768,2.2l5.222-10.866a.6.6,0,0,1,1.09,0L35.01,46.717a2.182,2.182,0,1,0,3.77-2.2L34.2,34.458l-.116-.535V25.34a.537.537,0,0,1,.459-.531l7.023-1.022a2.181,2.181,0,1,0-.626-4.317Z" transform="translate(0 0)" fill="url(#linear-gradient)"/>
+    </g>
+  </g>
+</svg>

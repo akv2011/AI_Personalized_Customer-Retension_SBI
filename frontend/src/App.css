@@ -140,3 +140,114 @@ input:focus {
 .gradient-secondary {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
 }
+
+/* Navbar Styles - Flat, Seamless Horizontal Layout */
+.navbar-gradient {
+  background: linear-gradient(to right, #2563eb, #9333ea, #ec4899);
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.nav-item {
+  flex: 1;
+  height: 64px;
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.nav-item:hover {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+}
+
+.nav-item button {
+  width: 100%;
+  height: 100%;
+  background: transparent;
+  border: none;
+  color: white;
+  font-weight: bold;
+  font-size: 0.875rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.nav-item button:hover {
+  transform: translateY(-1px);
+}
+
+.nav-item button:active {
+  transform: translateY(0);
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .navbar-gradient {
+    display: none;
+  }
+}
+
+@media (min-width: 1024px) {
+  .nav-container {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    width: 100%;
+  }
+  
+  .nav-main {
+    flex: 1;
+  }
+  
+  .nav-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+}
+
+/* Search box styling */
+.search-box {
+  width: 200px;
+  padding: 8px 12px 8px 32px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 14px;
+  transition: all 0.3s ease;
+}
+
+.search-box:focus {
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+/* Online Plans button styling */
+.online-plans-btn {
+  background: #fbbf24;
+  color: #000;
+  padding: 12px 16px;
+  border-radius: 6px;
+  font-weight: bold;
+  font-size: 14px;
+  border: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 48px;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.online-plans-btn:hover {
+  background: #f59e0b;
+  transform: translateY(-1px);
+}
+
+.online-plans-btn:active {
+  transform: translateY(0);
+}

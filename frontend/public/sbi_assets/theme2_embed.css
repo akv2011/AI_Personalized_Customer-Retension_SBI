@@ -1,0 +1,316 @@
+:root{
+--pseudo-bordercolor: #D3E7FF;
+}
+
+#allincall-popup{
+    bottom: 1.2em !important;
+    transition: all 0.1s ease !important;
+}
+#allincall-popup:hover{
+    bottom: 1.6em !important;
+    transition: all 0.1s ease !important;
+
+}
+
+#allincall-chat-box {
+bottom: 4em !important;
+right: 2em !important;
+width: 420px !important;
+animation-duration: 1s !important ; 
+height: 87vh !important;
+border-radius: 5px !important;
+border: 0.0em solid rgba(0, 0, 0, 0.2);
+display: none;
+border: none;
+position: fixed;
+animation-fill-mode: forwards;
+animation-timing-function: ease;
+box-shadow: 0px 0px 60px rgba(0, 0, 0, 0.25) !important;
+}
+#allincall-minimize-popup{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+@media only screen and (max-width: 1024px) and (min-height: 1025px) {
+    #allincall-chat-box {
+        height: 60vh !important;
+    }
+}
+/*-----------------------------------------------------------------*/
+#easychat-bot-close-button{
+    width: : 38px;
+    height: 42px;
+    transition: transform 0.2s ease-out;
+    box-shadow: 0px 2px 12px rgb(0 133 255 / 50%);
+    border-radius: 5px;
+    text-align: center;
+    cursor: pointer;
+    z-index: 9999;
+}
+
+#easychat-bot-close-button:hover {
+    transform: translateY(-3px);
+}
+
+.notification-intent-message-bubble:hover {
+    cursor: pointer;
+}
+
+.notification-intent-message-bubble {
+    max-width: 305px;
+}
+
+/* --------------------------------------------------------------------------- */
+@media screen and (max-width: 281px){
+    .allincall-notification-message {
+        max-width: 140px !important;
+    }
+}
+@media only screen and (max-width: 428px) {
+/* For mobile phones: */
+#allincall-chat-box {
+bottom: 0em !important;
+right: 0em !important;
+width: 432px;
+animation-duration: 1s !important ; 
+height: 600px;
+max-height: 100%;
+border-radius: 0.8em;
+border: 0.0em solid rgba(0, 0, 0, 0.2);
+display: none;
+border: none;
+position: fixed;
+animation-fill-mode: forwards;
+animation-timing-function: ease;
+box-shadow: 0px 0px 60px rgba(0, 0, 0, 0.25) !important;
+}
+    #easychat-bot-close-button{
+        display: none !important;
+    }
+    
+}
+
+
+@keyframes showUp {
+0% {
+opacity: 0;
+transform: translate(0, 30px);
+}
+
+100% {
+opacity: 1;
+transform: translate(0, 0);
+display: block;
+}
+}
+
+@keyframes bottom-left-right-anime {
+0% {
+opacity: 0;
+transform: translate(0, 0);
+}
+
+100% {
+opacity: 1;
+transform: translate(0, -30px);
+    display: block;
+
+}
+}
+@keyframes bottom-left-right-anime-close {
+0% {
+opacity: 1;
+transform: translate(0, 0);
+}
+
+100% {
+opacity: 0;
+transform: translate(0, -30px);
+    display: none;
+
+}
+}
+
+@keyframes top-left-right-anime {
+from {
+    transform: translateY(-40em)
+}
+
+to {
+    transform: translateY(0em)
+}
+}
+
+
+#allincall-popup {
+transition: all 0.2s ease-in-out;
+display: block;
+}
+
+@media screen and (max-width: 428px) {
+
+#allincall-popup {
+    right: 0px !important;
+}
+
+.notification-message-div{
+    right: 110px;
+}
+
+/*.allincall-notification-message{
+    max-width: 190px;
+    max-height: 250px;
+    overflow-y: scroll;
+}*/
+/*#allincall-notification-count{
+    right: 20px;
+}*/
+
+#allincall-chat-box {
+    width: 98% !important;
+    height: 99% !important;
+    bottom: 0;
+    right: 1% !important;
+}
+
+@keyframes my-amine-blo {
+    from {
+        opacity: 0;
+        height: 0vh;
+        width: 0%;
+    }
+
+    to {
+        opacity: 1;
+        height: 100vh;
+        width: 100%;
+    }
+}
+
+@keyframes my-amine-blo-close {
+    from {
+        opacity: 1;
+        height: 100vh;
+        width: 100%;
+        display: block;
+    }
+
+    to {
+        opacity: 0;
+        height: 0vh;
+        width: 0%;
+        display: none;
+    }
+}
+}
+
+
+
+@keyframes my-amine-blo-close {
+0% {
+opacity: 1;
+transform: translate(0, 0);
+}
+
+100% {
+opacity: 0;
+transform: translate(0, -30px);
+}
+}
+@keyframes right-anime-close {
+from {
+    transform: translateX(0em);
+    display: block;
+}
+
+to {
+    transform: translateX(30em);
+    display: none;
+}
+}
+
+@keyframes left-anime-close {
+ 0% {
+opacity: 0;
+transform: translate(0, 0);
+}
+
+100% {
+opacity: 1;
+transform: translate(0, 30px);
+}
+}
+
+
+@keyframes bottom-left-right-anime-close {
+0% {
+opacity: 1;
+transform: translate(0, 0);
+}
+
+100% {
+opacity: 0;
+transform: translate(0, 30px);
+}
+}
+
+
+@keyframes top-left-right-anime-close {
+0% {
+opacity: 0;
+transform: translate(0, 0);
+}
+
+100% {
+opacity: 1;
+transform: translate(0, 30px);
+}
+}
+
+.new-notification-div {
+    z-index: 2147483647;
+    position: fixed;
+    width: 45px;
+    height: 45px;
+    right: 0px;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    bottom: 135px;
+}
+/* Custom CSS changes */
+.notification-message-sub-div{
+    white-space: break-spaces;
+    position: relative;
+    top: 4px;
+    width: 88%;
+}
+.notification-message-sub-div-1{
+    white-space: break-spaces;
+    position: relative;
+    top: -6px;
+}
+.notification-message-intent-bubble-sub-text{
+    white-space: break-spaces;
+    position: relative;
+    top: 4px;
+    width:88%;
+}
+.notification-intent-message-bubble{
+    border-radius: 4px;
+    font-size: 14px;
+    padding: 4px 14px 5px 14px;
+    margin-bottom: 4px;
+    color: #FFF;
+    text-align: center;
+    line-height: 25px;
+    width: max-content;
+    transform-origin: 100% 0;
+    transition: 0.3s ease;
+    font-weight: 600;
+    direction: ltr;
+    letter-spacing: 0.2px;
+}
