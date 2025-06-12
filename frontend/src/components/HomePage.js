@@ -765,6 +765,12 @@ const HomePage = () => {
                                                     fontSize: '13px',
                                                     letterSpacing: '0.2px'
                                                   }}
+                                                  onClick={(e) => {
+                                                    e.preventDefault();
+                                                    if (nestedItem === 'SBI Life - Smart Swadhan Supreme') {
+                                                      setIsSearchModalOpen(true);
+                                                    }
+                                                  }}
                                                 >
                                                   {nestedItem}
                                                 </a>
@@ -1768,7 +1774,18 @@ const HomePage = () => {
                   <button className="bg-green-600 text-white px-8 py-3 rounded-lg font-bold hover:bg-green-700 transition-colors">
                     Buy Online
                   </button>
-                  <button className="border border-gray-300 text-gray-700 px-8 py-3 rounded-lg font-bold hover:bg-gray-50 transition-colors">
+                  <button 
+                    className="border border-gray-300 text-gray-700 px-8 py-3 rounded-lg font-bold hover:bg-gray-50 transition-colors flex items-center justify-center"
+                    onClick={() => {
+                      const link = document.createElement('a');
+                      link.href = '/SBI_Life_Smart_Swadhan_Supreme_Brochure.pdf';
+                      link.download = 'SBI_Life_Smart_Swadhan_Supreme_Brochure.pdf';
+                      document.body.appendChild(link);
+                      link.click();
+                      document.body.removeChild(link);
+                    }}
+                  >
+                    <Download className="w-4 h-4 mr-2" />
                     Download Brochure
                   </button>
                 </div>
