@@ -1,5 +1,5 @@
-import React from 'react';
-import { User, Bot, AlertCircle, Navigation } from 'lucide-react';
+import React, { useState } from 'react';
+import { User, Bot, AlertCircle, Navigation, Volume2, VolumeX } from 'lucide-react';
 
 // Enhanced helper function to render formatted text with paragraphs, ordered lists, and nested unordered lists
 const renderFormattedContent = (content, isBot) => {
@@ -49,7 +49,67 @@ const renderFormattedContent = (content, isBot) => {
   return elements;
 };
 
-const MessageBubble = ({ message, isBot, onShowGuidance }) => {
+const MessageBubble = ({ message, isBot, onShowGuidance, onSpeak, selectedLanguage = 'en' }) => {
+  const [isSpeaking, setIsSpeaking] = useState(false);
+
+  // Extract text content from message for TTS
+  const getTextForSpeech = () => {
+    if (!message?.text?.sections) return '';
+    
+    return message.text.sections
+      .map(section => {
+        if (section.type === 'main_response') {
+          return section.content;
+        }
+        return '';
+      })
+      .join(' ')
+      .trim();
+  };
+
+  // Handle text-to-speech
+  const handleSpeakClick = async () => {
+    const textToSpeak = getTextForSpeech();
+    if (!textToSpeak) return;
+
+    if (isSpeaking) {
+      // Stop speech
+      if ('speechSynthesis' in window) {
+        speechSynthesis.cancel();
+      }
+      setIsSpeaking(false);
+    } else {
+      // Start speech
+      setIsSpeaking(true);
+      try {
+        if (onSpeak) {
+          await onSpeak(textToSpeak);
+        } else {
+          // Fallback to browser speech synthesis
+          if ('speechSynthesis' in window) {
+            const utterance = new SpeechSynthesisUtterance(textToSpeak);
+            const langMap = {
+              'en': 'en-US',
+              'hi': 'hi-IN',
+              'mr': 'mr-IN'
+            };
+            utterance.lang = langMap[selectedLanguage] || 'en-US';
+            utterance.rate = 0.9;
+            utterance.pitch = 1;
+            
+            utterance.onend = () => {
+              setIsSpeaking(false);
+            };
+            
+            speechSynthesis.speak(utterance);
+          }
+        }
+      } catch (error) {
+        console.error('Error speaking text:', error);
+        setIsSpeaking(false);
+      }
+    }
+  };
   const renderSection = (section, index) => {
     switch (section.type) {
       case 'main_response':
@@ -110,10 +170,28 @@ const MessageBubble = ({ message, isBot, onShowGuidance }) => {
   // ... rest of the component remains the same ...
   return (
     <div className={`flex ${isBot ? 'justify-start' : 'justify-end'} gap-3`}>
-      {/* ... existing icons ... */}
+      {/* Bot icon and TTS button */}
       {isBot && (
-        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center flex-shrink-0">
-          <Bot className="w-5 h-5 text-white" />
+        <div className="flex flex-col items-center gap-2">
+          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center flex-shrink-0">
+            <Bot className="w-5 h-5 text-white" />
+          </div>
+          {/* Text-to-Speech button for bot messages */}
+          <button
+            onClick={handleSpeakClick}
+            className={`p-2 rounded-full transition-all ${
+              isSpeaking
+                ? 'bg-red-500 text-white animate-pulse'
+                : 'bg-gray-100 hover:bg-gray-200 text-gray-600'
+            }`}
+            title={isSpeaking ? 'Stop speaking' : 'Listen to message'}
+          >
+            {isSpeaking ? (
+              <VolumeX className="w-4 h-4" />
+            ) : (
+              <Volume2 className="w-4 h-4" />
+            )}
+          </button>
         </div>
       )}
       <div className={`max-w-[80%] space-y-2`}>

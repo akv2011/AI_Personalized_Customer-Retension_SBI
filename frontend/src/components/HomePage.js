@@ -150,7 +150,21 @@ const HomePage = () => {
     { code: 'ta', name: 'தமிழ்', flag: '🇮🇳' },
     { code: 'te', name: 'తెలుగు', flag: '🇮🇳' },
     { code: 'kn', name: 'ಕನ್ನಡ', flag: '🇮🇳' },
-    { code: 'bn', name: 'বাংলা', flag: '🇮🇳' }
+    { code: 'bn', name: 'বাংলা', flag: '🇮🇳' },
+    { code: 'ml', name: 'മലയാളം', flag: '🇮🇳' },
+    { code: 'or', name: 'ଓଡ଼ିଆ', flag: '🇮🇳' },
+    { code: 'pa', name: 'ਪੰਜਾਬੀ', flag: '🇮🇳' },
+    { code: 'as', name: 'অসমীয়া', flag: '🇮🇳' },
+    { code: 'ur', name: 'اردو', flag: '🇮🇳' },
+    { code: 'sa', name: 'संस्कृत', flag: '🇮🇳' },
+    { code: 'ne', name: 'नेपाली', flag: '🇮🇳' },
+    { code: 'si', name: 'සිංහල', flag: '🇱🇰' },
+    { code: 'my', name: 'မြန်မာ', flag: '🇲🇲' },
+    { code: 'sd', name: 'سنڌي', flag: '🇮🇳' },
+    { code: 'ks', name: 'کٲشُر', flag: '🇮🇳' },
+    { code: 'do', name: 'डोगरी', flag: '🇮🇳' },
+    { code: 'mni', name: 'ꯃꯩꯇꯩꯂꯣꯟ', flag: '🇮🇳' },
+    { code: 'kok', name: 'कोंकणी', flag: '🇮🇳' }
   ];
 
   const loginOptions = [
@@ -236,21 +250,29 @@ const HomePage = () => {
       title: "Shield Your Family's Future",
       subtitle: "Comprehensive protection plans that secure your loved ones' financial well-being.",
       bgColor: "from-blue-600 via-blue-700 to-purple-800",
-      image: "https://www.sbilife.co.in/content/dam/sbilife/hero-banner/family-protection.jpg"
+      image: "/New_assets/1-138.webp"
     },
     {
       title: "Retirement Planning Made Simple",
       subtitle: "Plan today for a worry-free tomorrow with our retirement solutions.",
       bgColor: "from-green-600 via-teal-600 to-blue-800",
-      image: "https://www.sbilife.co.in/content/dam/sbilife/hero-banner/retirement-planning.jpg"
+      image: "/New_assets/sbi desktop.jpg"
     },
     {
       title: "Child's Bright Future Starts Here",
       subtitle: "Give wings to your child's dreams with our education planning solutions.",
       bgColor: "from-orange-500 via-red-500 to-pink-700",
-      image: "https://www.sbilife.co.in/content/dam/sbilife/hero-banner/child-education.jpg"
+      image: "/New_assets/childfutureplan.jpg"
     }
   ];
+
+  // Preload all hero images for smooth transitions
+  React.useEffect(() => {
+    heroSlides.forEach((slide) => {
+      const img = new Image();
+      img.src = slide.image;
+    });
+  }, []);
 
   const nextSlide = () => {
     setCurrentSlide((prev) => (prev + 1) % heroSlides.length);
@@ -575,7 +597,7 @@ const HomePage = () => {
                     <div className="absolute top-20 right-4 w-64 bg-white rounded-lg shadow-2xl border z-[10000]">
                       <div className="p-6">
                         <h3 className="text-xl font-semibold text-gray-800 mb-6">Select Language</h3>
-                        <div className="space-y-3 max-h-80 overflow-y-auto">
+                        <div className="space-y-3 max-h-80 overflow-y-auto language-dropdown-scroll">
                           {languages.map((lang) => (
                             <button
                               key={lang.code}
@@ -981,14 +1003,23 @@ const HomePage = () => {
               </div>
             </div>
             <div className="flex justify-center lg:justify-end">
-              <img 
-                src={heroSlides[currentSlide].image}
-                alt="SBI Life Insurance"
-                className="max-w-md w-full h-auto rounded-lg"
-                onError={(e) => {
-                  e.target.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='300' viewBox='0 0 400 300'%3E%3Crect width='400' height='300' fill='%23003d82'/%3E%3Ctext x='200' y='150' font-family='Arial' font-size='18' font-weight='bold' fill='white' text-anchor='middle'%3ESBI Life%3C/text%3E%3C/svg%3E";
-                }}
-              />
+              <div className="w-full max-w-md h-80 overflow-hidden rounded-lg bg-white bg-opacity-10">
+                <img 
+                  src={heroSlides[currentSlide].image}
+                  alt={`SBI Life Insurance - ${heroSlides[currentSlide].title}`}
+                  className="w-full h-full object-cover object-center"
+                  onError={(e) => {
+                    // Try to load a local fallback image first
+                    if (!e.target.src.includes('sbi-family-protection.webp')) {
+                      e.target.src = "/sbi-family-protection.webp";
+                    } else {
+                      // Final fallback to SVG placeholder
+                      e.target.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='300' viewBox='0 0 400 300'%3E%3Crect width='400' height='300' fill='%23003d82'/%3E%3Ctext x='200' y='150' font-family='Arial' font-size='18' font-weight='bold' fill='white' text-anchor='middle'%3ESBI Life%3C/text%3E%3C/svg%3E";
+                    }
+                  }}
+                  loading="lazy"
+                />
+              </div>
             </div>
           </div>
         </div>
@@ -1110,7 +1141,7 @@ const HomePage = () => {
             <div className="bg-white rounded-lg shadow-lg overflow-hidden group hover:shadow-xl transition-all duration-300">
               <div className="relative h-56 overflow-hidden">
                 <img 
-                  src="https://www.sbilife.co.in/content/dam/sbilife/explore-plans/protection-plans.jpg" 
+                  src="/sbi-family-protection.webp" 
                   alt="Insurance Protection Plan"
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                   onError={(e) => {
@@ -1139,7 +1170,7 @@ const HomePage = () => {
             <div className="bg-white rounded-lg shadow-lg overflow-hidden group hover:shadow-xl transition-all duration-300">
               <div className="relative h-56 overflow-hidden">
                 <img 
-                  src="https://www.sbilife.co.in/content/dam/sbilife/explore-plans/retirement-plans.jpg" 
+                  src="/smart-swadhan-banner.png" 
                   alt="Retirement Benefits"
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                   onError={(e) => {
@@ -1168,7 +1199,7 @@ const HomePage = () => {
             <div className="bg-white rounded-lg shadow-lg overflow-hidden group hover:shadow-xl transition-all duration-300">
               <div className="relative h-56 overflow-hidden">
                 <img 
-                  src="https://www.sbilife.co.in/content/dam/sbilife/explore-plans/child-plans.jpg" 
+                  src="/sbi-sahara-banner.webp" 
                   alt="Child's Future Planning"
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                   onError={(e) => {
