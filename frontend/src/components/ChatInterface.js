@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Send, User, Bot, Paperclip, Mic, Circle, FileText, Calendar, Phone, Bell, Settings, Globe, Search } from 'lucide-react'; // Added Search icon
+import { Send, User, Bot, Paperclip, Mic, Circle, FileText, Calendar, Phone, Bell, Settings, Globe, Search, Navigation } from 'lucide-react'; // Added Search and Navigation icons
 import MessageBubble from './MessageBubble';
+import SmartSwadhanGuidance from './SmartSwadhanGuidance';
 
 const ChatInterface = () => {
   const [messages, setMessages] = useState([
@@ -27,6 +28,8 @@ const ChatInterface = () => {
   const [isThinking, setIsThinking] = useState(false);
   const [selectedLanguage, setSelectedLanguage] = useState('en');
   const [isGeminiSearchActive, setIsGeminiSearchActive] = useState(false); // <-- New state for Gemini Search toggle
+  const [showSmartSwadhanGuidance, setShowSmartSwadhanGuidance] = useState(false); // <-- New state for guidance modal
+  const [currentGuidanceQuery, setCurrentGuidanceQuery] = useState(''); // <-- Store the query that triggered guidance
   const fileInputRef = useRef(null); // Ref for file input
   const recognitionRef = useRef(null); // Ref for SpeechRecognition instance
 
@@ -57,6 +60,41 @@ const ChatInterface = () => {
 
       console.log("Attempting to send message:", currentInputText); // Log 1: Before fetch
       console.log("Gemini Search Active:", isGeminiSearchActive); // Log if Gemini Search is active
+
+      // Check if user is asking about Smart Swadhan guidance
+      const smartSwadhanKeywords = [
+        'smart swadhan', 'swadhan supreme', 'guide me to smart swadhan', 
+        'show me smart swadhan', 'navigate to smart swadhan', 'smart swadhan scheme',
+        'how to find smart swadhan', 'where is smart swadhan', 'smart swadhan supreme page'
+      ];
+      
+      const isSmartSwadhanQuery = smartSwadhanKeywords.some(keyword => 
+        currentInputText.toLowerCase().includes(keyword.toLowerCase())
+      );
+
+      if (isSmartSwadhanQuery) {
+        console.log("Smart Swadhan guidance detected, showing visual guide");
+        setCurrentGuidanceQuery(currentInputText);
+        setShowSmartSwadhanGuidance(true);
+        setIsThinking(false);
+        
+        // Add a message indicating guidance is being shown
+        const guidanceMessage = {
+          id: messages.length + 2,
+          text: {
+            sections: [
+              {
+                type: 'main_response',
+                content: "🎯 I'll show you exactly how to navigate to Smart Swadhan Supreme! Opening visual step-by-step guidance..."
+              }
+            ]
+          },
+          isBot: true,
+          showGuidanceButton: true
+        };
+        setMessages((prev) => [...prev, guidanceMessage]);
+        return;
+      }
 
       try {
         // <-- Modified fetch logic -->
@@ -307,7 +345,12 @@ const ChatInterface = () => {
       {/* Chat Messages */}
       <div className="flex-1 overflow-y-auto p-4 space-y-6">
         {messages.map((message) => (
-          <MessageBubble key={message.id} message={message} isBot={message.isBot} />
+          <MessageBubble 
+            key={message.id} 
+            message={message} 
+            isBot={message.isBot}
+            onShowGuidance={() => setShowSmartSwadhanGuidance(true)}
+          />
         ))}
 
         {isThinking && (
@@ -388,6 +431,13 @@ const ChatInterface = () => {
           </div>
         </div>
       </div>
+      
+      {/* Smart Swadhan Guidance Modal */}
+      <SmartSwadhanGuidance 
+        isVisible={showSmartSwadhanGuidance}
+        onClose={() => setShowSmartSwadhanGuidance(false)}
+        userQuery={currentGuidanceQuery}
+      />
     </div>
   );
 };

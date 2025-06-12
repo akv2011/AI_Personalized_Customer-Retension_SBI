@@ -17,6 +17,8 @@ from src.utils.pdf_processor import extract_text_from_pdf
 from src.embedding_service.embedding_generator import EmbeddingGenerator
 from src.vector_database.vector_db_client import VectorDBClient
 from src.config.config import GOOGLE_API_KEY
+# Add import for Smart Swadhan guidance
+from src.web_scraping.hyper_sbi_scraper import get_smart_swadhan_guidance_sync
 import logging # Added logging
 
 app = Flask(__name__)
@@ -202,6 +204,67 @@ def gemini_search_api():
     except Exception as e:
         logging.exception(f"Error in gemini_search_api: {str(e)}")
         return jsonify({"error": "Server error during Gemini search", "message": str(e)}), 500
+
+@app.route('/smart_swadhan_guidance', methods=['POST'])
+def smart_swadhan_guidance_api():
+    """API endpoint for Smart Swadhan Supreme navigation guidance"""
+    try:
+        data = request.get_json()
+        user_query = data.get('query', 'Guide me to Smart Swadhan Supreme')
+        
+        logging.info(f"Smart Swadhan guidance requested: {user_query}")
+        
+        # Get AI-powered guidance
+        guidance_result = get_smart_swadhan_guidance_sync(user_query)
+        
+        if guidance_result.get('success'):
+            logging.info("Smart Swadhan guidance generated successfully")
+            return jsonify({
+                "success": True,
+                "guidance": guidance_result.get('guidance'),
+                "navigation_steps": guidance_result.get('navigation_data', {}).get('navigation_steps', []),
+                "product_summary": guidance_result.get('guidance', {}).get('product_summary', ''),
+                "total_steps": guidance_result.get('guidance', {}).get('total_steps', 0),
+                "recommended_actions": guidance_result.get('guidance', {}).get('recommended_actions', [])
+            }), 200
+        else:
+            logging.error(f"Failed to generate Smart Swadhan guidance: {guidance_result.get('error')}")
+            return jsonify({
+                "success": False,
+                "error": guidance_result.get('error', 'Unknown error'),
+                "message": "Failed to generate navigation guidance"
+            }), 500
+            
+    except Exception as e:
+        logging.exception(f"Error in smart_swadhan_guidance_api: {str(e)}")
+        return jsonify({
+            "success": False,
+            "error": "Server error during guidance generation",
+            "message": str(e)
+        }), 500
+
+@app.route('/test_scraper', methods=['GET'])
+def test_scraper_api():
+    """Test endpoint to verify the scraper functionality"""
+    try:
+        # Import and test the scraper
+        from src.web_scraping.hyper_sbi_scraper import get_smart_swadhan_guidance_sync
+        
+        result = get_smart_swadhan_guidance_sync("Test Smart Swadhan navigation")
+        
+        return jsonify({
+            "success": True,
+            "message": "Scraper test completed",
+            "result": result
+        }), 200
+        
+    except Exception as e:
+        logging.exception(f"Error in test_scraper_api: {str(e)}")
+        return jsonify({
+            "success": False,
+            "error": str(e),
+            "message": "Scraper test failed"
+        }), 500
 
 @app.route('/upload_pdf', methods=['POST'])
 def upload_pdf_api():

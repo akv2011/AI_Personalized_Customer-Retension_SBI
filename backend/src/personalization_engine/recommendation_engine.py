@@ -72,6 +72,27 @@ class RecommendationEngine:
     def process_user_interaction(self, customer_id, interaction_text, interaction_type="chatbot", user_language='en'): # Add user_language
         """Processes user interaction, stores it in FAISS, gets a personalized response, and updates chat history."""
         conversation_turn_id = f"{customer_id}_{int(pd.Timestamp.now().timestamp())}"
+        
+        # Check if this is a Smart Swadhan guidance request
+        smart_swadhan_keywords = [
+            'smart swadhan', 'swadhan supreme', 'guide me to smart swadhan', 
+            'show me smart swadhan', 'navigate to smart swadhan', 'smart swadhan scheme',
+            'how to find smart swadhan', 'where is smart swadhan', 'smart swadhan supreme page'
+        ]
+        
+        is_smart_swadhan_query = any(keyword in interaction_text.lower() for keyword in smart_swadhan_keywords)
+        
+        if is_smart_swadhan_query:
+            # Return special response indicating visual guidance should be shown
+            return {
+                "response": "🎯 I'll show you exactly how to navigate to Smart Swadhan Supreme! This is a comprehensive Individual, Non-Linked, Non-Participating Life Insurance Savings Product (UIN: 111N140V02) that combines life protection with guaranteed return of premiums. Let me open the visual step-by-step navigation guide for you.",
+                "sentiment": "Positive",
+                "source": "Smart Swadhan Guidance System",
+                "show_visual_guidance": True,
+                "product_focus": "smart_swadhan_supreme"
+            }
+        
+        # Continue with normal processing for other queries
         # Embed interaction text (usually document context)
         embedding = self.embedding_generator.get_embedding(interaction_text, task_type="RETRIEVAL_DOCUMENT") # Specify task type
         if not embedding:

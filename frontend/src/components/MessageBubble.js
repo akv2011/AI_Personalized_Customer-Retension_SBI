@@ -1,5 +1,5 @@
 import React from 'react';
-import { User, Bot, AlertCircle } from 'lucide-react';
+import { User, Bot, AlertCircle, Navigation } from 'lucide-react';
 
 // Enhanced helper function to render formatted text with paragraphs, ordered lists, and nested unordered lists
 const renderFormattedContent = (content, isBot) => {
@@ -49,7 +49,7 @@ const renderFormattedContent = (content, isBot) => {
   return elements;
 };
 
-const MessageBubble = ({ message, isBot }) => {
+const MessageBubble = ({ message, isBot, onShowGuidance }) => {
   const renderSection = (section, index) => {
     switch (section.type) {
       case 'main_response':
@@ -141,6 +141,17 @@ const MessageBubble = ({ message, isBot }) => {
               </div>
             ))}
           </div>
+        )}
+        
+        {/* Smart Swadhan Guidance Button */}
+        {isBot && message.showGuidanceButton && onShowGuidance && (
+          <button
+            onClick={onShowGuidance}
+            className="mt-3 px-4 py-2 bg-gradient-to-r from-red-600 to-purple-600 text-white rounded-lg hover:from-red-700 hover:to-purple-700 transition-all flex items-center gap-2 text-sm font-medium"
+          >
+            <Navigation className="w-4 h-4" />
+            Show Visual Navigation Guide
+          </button>
         )}
       </div>
        {/* ... existing icons ... */}
