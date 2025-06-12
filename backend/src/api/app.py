@@ -11,17 +11,22 @@ import google.generativeai as genai
 from google.generativeai.types import Tool 
 from google.generativeai import GenerationConfig # Corrected import for GenerationConfig
 # --- End Added imports ---
+# Add Exa API import
+from exa_py import Exa
 from src.personalization_engine.recommendation_engine import RecommendationEngine
 from flask_cors import CORS
 from src.utils.language_service import LanguageService
 from src.utils.pdf_processor import extract_text_from_pdf
 from src.embedding_service.embedding_generator import EmbeddingGenerator
 from src.vector_database.vector_db_client import VectorDBClient
-from src.config.config import GOOGLE_API_KEY
+from src.config.config import GOOGLE_API_KEY, EXA_API_KEY
 # Add import for Smart Swadhan guidance
 from src.web_scraping.hybrid_scraper import get_hybrid_smart_swadhan_guidance
+# Add speech service import
+from src.utils.speech_service import get_speech_service, speak_text, transcribe_audio, record_and_transcribe
 import logging # Added logging
 import asyncio # Add asyncio for database operations
+import base64  # For audio data encoding
 
 # Add database service imports
 try:
@@ -44,6 +49,12 @@ if not GOOGLE_API_KEY:
     raise ValueError("GOOGLE_API_KEY environment variable not set")
 genai.configure(api_key=GOOGLE_API_KEY)
 
+# Configure Exa API
+if not EXA_API_KEY:
+    logging.error("EXA_API_KEY environment variable not set")
+    raise ValueError("EXA_API_KEY environment variable not set")
+exa = Exa(EXA_API_KEY)
+
 # Configuration for file uploads
 UPLOAD_FOLDER = './uploads'
 ALLOWED_EXTENSIONS = {'pdf'}
@@ -55,6 +66,55 @@ if not os.path.exists(UPLOAD_FOLDER):
 recommender = RecommendationEngine()
 language_service = LanguageService()
 
+def format_response_text(text):
+    """Format response text for better readability with proper spacing and structure"""
+    if not text:
+        return text
+    
+    # Remove markdown formatting
+    import re
+    text = re.sub(r'\*\*(.*?)\*\*', r'\1', text)  # Remove bold markdown
+    text = re.sub(r'\*(.*?)\*', r'\1', text)      # Remove italic markdown
+    text = re.sub(r'#{1,6}\s*(.*)', r'\1', text)  # Remove headers
+    
+    # Split into paragraphs and process
+    paragraphs = text.split('\n\n')
+    formatted_paragraphs = []
+    
+    for para in paragraphs:
+        para = para.strip()
+        if not para:
+            continue
+            
+        # Check if it's a heading-like line (short and descriptive)
+        if len(para) < 100 and ':' in para and not para.startswith('-'):
+            # Format as heading
+            formatted_paragraphs.append(f"\n{para.upper()}\n")
+        elif para.startswith('-') or para.startswith('•'):
+            # Format bullet points with proper spacing
+            lines = para.split('\n')
+            bullet_points = []
+            for line in lines:
+                line = line.strip()
+                if line.startswith('-') or line.startswith('•'):
+                    # Clean and format bullet point
+                    clean_line = line.lstrip('-•').strip()
+                    bullet_points.append(f"  • {clean_line}")
+                else:
+                    bullet_points.append(f"    {line}")
+            formatted_paragraphs.append('\n'.join(bullet_points))
+        else:
+            # Regular paragraph
+            formatted_paragraphs.append(para)
+    
+    # Join with proper spacing
+    result = '\n\n'.join(formatted_paragraphs)
+    
+    # Ensure proper spacing around sections
+    result = re.sub(r'\n{3,}', '\n\n', result)  # Limit multiple newlines
+    
+    return result.strip()
+
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
@@ -63,10 +123,14 @@ def chat_api():
     """Enhanced chat API with PostgreSQL MCP Server integration"""
     try:
         data = request.get_json()
+        if not data:
+            logging.warning("No JSON data received in chat request")
+            return jsonify({"error": "No JSON data received"}), 400
+            
         customer_id = data.get('customer_id')
         user_input_text = data.get('user_input_text')
         user_language = data.get('language', 'en')
-        logging.info(f"Received chat request: customer_id={customer_id}, language={user_language}, input='{user_input_text[:50]}...'")
+        logging.info(f"Received chat request: customer_id={customer_id}, language={user_language}, input='{user_input_text[:50] if user_input_text else 'None'}...'")
 
         if not customer_id or not user_input_text:
             logging.warning("Missing customer_id or user_input_text in chat request")
@@ -144,15 +208,16 @@ def chat_api():
         return jsonify({"error": "Server error", "message": str(e)}), 500
 
 @app.route('/gemini_search', methods=['POST'])
-def gemini_search_api():
+def exa_search_api():
+    """Enhanced search API using Exa web search with internal knowledge base grounding"""
     try:
         data = request.get_json()
         query = data.get('query')
         user_language = data.get('language', 'en')
-        logging.info(f"Received Gemini Search request: language={user_language}, query='{query[:50]}...'")
+        logging.info(f"Received Exa Search request: language={user_language}, query='{query[:50]}...'")
 
         if not query:
-            logging.warning("Missing query in Gemini Search request")
+            logging.warning("Missing query in Exa Search request")
             return jsonify({"error": "Missing query"}), 400
 
         # 1. Get relevant context from our vector database (FAISS)
@@ -160,7 +225,7 @@ def gemini_search_api():
         embed_gen = EmbeddingGenerator()
         # Translate query to English for embedding/search consistency
         english_query_for_search = language_service.translate_to_english(query, user_language)
-        logging.info(f"Translated Gemini query to English for search: '{english_query_for_search[:50]}...'")
+        logging.info(f"Translated Exa query to English for search: '{english_query_for_search[:50]}...'")
         query_embedding = embed_gen.get_embedding(english_query_for_search, task_type="RETRIEVAL_QUERY")
         
         context = "" # Initialize context
@@ -173,70 +238,125 @@ def gemini_search_api():
                         source_info = match['metadata'].get('filename', 'knowledge base')
                         context += f"Context from {source_info}:\n{match['metadata']['text']}\n\n---\n\n"
         else:
-            logging.warning("Failed to generate embedding for Gemini search query.")
+            logging.warning("Failed to generate embedding for Exa search query.")
 
-        # 2. Configure Gemini model and Google Search tool
-        # Use a model that supports grounding, like gemini-1.5-flash or gemini-pro
-        # --- Corrected model name ---
-        model = genai.GenerativeModel('gemini-1.5-flash-001') # Use a model known to support grounding well
-        # --- Define the Tool ---
-        google_search_tool = Tool(google_search_retrieval={})
-        # --- Remove incorrect GenerationConfig initialization for tools ---
-        # tool_config = GenerationConfig(tools=[google_search_tool]) 
-        # --- End Correction ---
-
-        # 3. Create the prompt, instructing the model to use search if needed
-        sbi_life_grounded_search_prompt = f"""You are an AI assistant for SBI Life Insurance. Your goal is to answer user queries accurately and helpfully, potentially aiding customer understanding and retention.
-
-        First, use the provided context from our internal knowledge base (if relevant and sufficient) to answer the user's query. 
-        If the internal context is insufficient, outdated, or doesn't answer the query (e.g., asking for the *very latest* schemes, news, or details not in the context), use Google Search to find the most current and relevant information about SBI Life.
-
-        Internal Knowledge Base Context:
-        {context if context else "No specific context retrieved from internal knowledge base."}
-        ---
-
-        User Query: {query}
-
-        Instructions:
-        1. Prioritize internal context if relevant and sufficient.
-        2. Use Google Search ONLY if internal context is insufficient/outdated OR the query explicitly asks for latest info.
-        3. Synthesize information from context and/or search results into a single, coherent response.
-        4. Keep the response concise, clear, and easy for a customer to understand.
-        5. Ensure accuracy, especially regarding policy details or financial information. Cite search results briefly if used.
-        6. Respond in the user's preferred language code: {user_language}.
-        7. Do NOT invent policy details or make promises SBI Life cannot keep.
-        8. Do NOT include markdown formatting. Use plain text and standard lists ('- ' for bullets).
-
-        Response:"""
-
-        # 4. Generate response with grounding enabled
-        logging.info("Calling Gemini API with search grounding enabled...")
-        response = model.generate_content(
-            sbi_life_grounded_search_prompt,
-            # --- Pass tools directly to generate_content ---
-            tools=[google_search_tool] 
-            # generation_config=tool_config # Remove this line
-        )
-
-        # Log grounding metadata if available (optional)
+        # 2. Perform Exa web search for additional information
+        web_search_results = ""
         try:
-            if response.candidates and response.candidates[0].grounding_metadata:
-                search_entry = response.candidates[0].grounding_metadata.search_entry_point
-                if search_entry:
-                    logging.info(f"Gemini used Google Search. Rendered Content: {search_entry.rendered_content[:100]}...")
-                else:
-                    logging.info("Grounding metadata present, but no search entry point found.")
+            logging.info("Performing Exa web search...")
+            # Create search query focused on SBI Life
+            search_query = f"SBI Life Insurance {english_query_for_search}"
+            
+            # Perform search and get content
+            exa_results = exa.search_and_contents(
+                search_query,
+                type="auto",  # Let Exa choose between neural and keyword search
+                num_results=3,  # Get top 3 results
+                text=True  # Get full text content
+            )
+            
+            if exa_results and exa_results.results:
+                logging.info(f"Exa search returned {len(exa_results.results)} results")
+                for i, result in enumerate(exa_results.results[:3]):
+                    web_search_results += f"Web Result {i+1} - {result.title}:\n"
+                    web_search_results += f"URL: {result.url}\n"
+                    if result.text:
+                        # Truncate text to prevent overly long responses
+                        content_snippet = result.text[:500] + "..." if len(result.text) > 500 else result.text
+                        web_search_results += f"Content: {content_snippet}\n\n---\n\n"
             else:
-                 logging.info("No grounding metadata found in response. Search likely not used.")
-        except Exception as meta_error:
-            logging.warning(f"Could not access or log grounding metadata: {meta_error}")
+                logging.warning("No results returned from Exa search")
+                web_search_results = "No additional web results found."
+                
+        except Exception as exa_error:
+            logging.error(f"Exa search failed: {exa_error}")
+            web_search_results = "Web search temporarily unavailable."
 
-        # 5. Process and translate the response
-        response_text = response.text
-        logging.info(f"Received response from Gemini: '{response_text[:100]}...'")
+        # 3. Use OpenAI to synthesize the response
+        try:
+            from openai import OpenAI
+            client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+            
+            synthesis_prompt = f"""You are an AI assistant for SBI Life Insurance. Your goal is to answer user queries accurately and helpfully, potentially aiding customer understanding and retention.
 
+You have access to two sources of information:
+
+Internal Knowledge Base Context:
+{context if context else "No specific context retrieved from internal knowledge base."}
+
+Web Search Results:
+{web_search_results}
+
+User Query: {query}
+
+Instructions:
+1. Prioritize internal context if relevant and sufficient.
+2. Use web search results to supplement or provide the latest information if internal context is insufficient.
+3. Synthesize information from both sources into a single, coherent response.
+4. Format your response with clear headings and bullet points for better readability.
+5. Use the following structure when applicable:
+   - Start with a brief overview paragraph
+   - Use clear section headings (e.g., "KEY BENEFITS:", "ELIGIBILITY:", "PREMIUM OPTIONS:")
+   - Use bullet points with proper spacing for lists
+   - End with a helpful summary or next steps
+6. Keep the response concise, clear, and easy for a customer to understand.
+7. Ensure accuracy, especially regarding policy details or financial information.
+8. If you use web search results, briefly mention that the information comes from recent sources.
+9. Do NOT invent policy details or make promises SBI Life cannot keep.
+10. Do NOT use markdown formatting like ** or *. Use plain text with clear spacing and structure.
+11. Focus specifically on SBI Life products and services.
+12. Use proper spacing between sections and bullet points for readability.
+
+Example format:
+PRODUCT OVERVIEW:
+Brief description of the product.
+
+KEY BENEFITS:
+  • First benefit with clear explanation
+  • Second benefit with details
+  • Third benefit
+
+ELIGIBILITY CRITERIA:
+  • Age requirements
+  • Other conditions
+
+PREMIUM INFORMATION:
+  • Payment options
+  • Amount details
+
+Respond in English first, then translate if needed."""
+
+            response = client.chat.completions.create(
+                model="gpt-4o",  # Use the latest model available
+                messages=[
+                    {"role": "system", "content": "You are a helpful assistant for SBI Life Insurance customers."},
+                    {"role": "user", "content": synthesis_prompt}
+                ],
+                max_tokens=500,
+                temperature=0.7
+            )
+            
+            response_text = response.choices[0].message.content
+            logging.info(f"Received response from OpenAI: '{response_text[:100]}...'")
+            
+            # Format the response text for better readability
+            response_text = format_response_text(response_text)
+        except Exception as openai_error:
+            logging.error(f"OpenAI synthesis failed: {openai_error}")
+            # Fallback to simple concatenation
+            if context:
+                response_text = f"Based on our knowledge base:\n\n{context[:400]}..."
+            elif web_search_results and "No additional web results found" not in web_search_results:
+                response_text = f"Based on recent information:\n\n{web_search_results[:400]}..."
+            else:
+                response_text = "I apologize, but I'm unable to find specific information about your query at the moment. Please contact SBI Life customer service for detailed assistance."
+            
+            # Apply formatting to fallback responses too
+            response_text = format_response_text(response_text)
+
+        # 4. Translate response if needed
         if user_language != 'en':
-            logging.info(f"Translating Gemini response to {user_language}...")
+            logging.info(f"Translating response to {user_language}...")
             translated_response = language_service.translate_from_english(
                 response_text,
                 user_language
@@ -244,15 +364,15 @@ def gemini_search_api():
             logging.info(f"Translated response: '{translated_response[:100]}...'")
             return jsonify({
                 "response": translated_response,
-                "original_response": response_text, # Keep original English response
+                "original_response": response_text,
                 "detected_language": user_language
             }), 200
         
         return jsonify({"response": response_text}), 200
 
     except Exception as e:
-        logging.exception(f"Error in gemini_search_api: {str(e)}")
-        return jsonify({"error": "Server error during Gemini search", "message": str(e)}), 500
+        logging.exception(f"Error in exa_search_api: {str(e)}")
+        return jsonify({"error": "Server error during Exa search", "message": str(e)}), 500
 
 @app.route('/smart_swadhan_guidance', methods=['POST'])
 def smart_swadhan_guidance_api():
@@ -653,6 +773,192 @@ def get_mcp_operations():
     except Exception as e:
         logging.exception(f"Error getting MCP operations: {e}")
         return jsonify({"error": "Server error", "message": str(e)}), 500
+
+# === Speech Service API Endpoints ===
+
+@app.route('/api/speech/text-to-speech', methods=['POST'])
+def text_to_speech_api():
+    """Convert text to speech and return audio"""
+    try:
+        data = request.get_json()
+        text = data.get('text')
+        language = data.get('language', 'english')
+
+        if not text:
+            return jsonify({"error": "Missing text to convert to speech"}), 400
+
+        # Map language codes to full names
+        language_map = {
+            'hi': 'hindi',
+            'en': 'english', 
+            'mr': 'marathi'
+        }
+        language = language_map.get(language, language)
+
+        logging.info(f"Converting text to speech: '{text[:50]}...' in {language}")
+        
+        # Get speech service and convert text to speech
+        speech_service = get_speech_service()
+        result = speech_service.text_to_speech(text, language)
+
+        if result['success']:
+            # Handle different response types
+            if 'audio_data' in result:
+                # Encode audio data to base64 for JSON response
+                audio_base64 = base64.b64encode(result['audio_data']).decode('utf-8')
+                return jsonify({
+                    "success": True,
+                    "audio_base64": audio_base64,
+                    "service": result.get('service', 'unknown'),
+                    "language": result.get('language', language)
+                }), 200
+            elif 'audio_path' in result:
+                # Return path for download
+                return jsonify({
+                    "success": True,
+                    "audio_path": result['audio_path'],
+                    "service": result.get('service', 'unknown'),
+                    "language": result.get('language', language)
+                }), 200
+        else:
+            return jsonify({
+                "success": False,
+                "error": result.get('error', 'TTS conversion failed')
+            }), 400
+
+    except Exception as e:
+        logging.exception(f"Error in text_to_speech_api: {str(e)}")
+        return jsonify({"error": "Server error during TTS conversion", "message": str(e)}), 500
+
+@app.route('/api/speech/speech-to-text', methods=['POST'])
+def speech_to_text_api():
+    """Convert speech to text from uploaded audio file"""
+    try:
+        language = request.form.get('language', 'english')
+        mime_type = request.form.get('mimeType', 'audio/webm')
+        
+        # Map language codes to full names
+        language_map = {
+            'hi': 'hindi',
+            'en': 'english', 
+            'mr': 'marathi'
+        }
+        language = language_map.get(language, language)
+
+        if 'audio' not in request.files:
+            return jsonify({"error": "No audio file provided"}), 400
+        
+        audio_file = request.files['audio']
+        if audio_file.filename == '':
+            return jsonify({"error": "No audio file selected"}), 400
+
+        # Save the uploaded audio file temporarily
+        filename = secure_filename(audio_file.filename)
+        audio_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        audio_file.save(audio_path)
+        
+        logging.info(f"Processing audio file: {filename} (mimeType: {mime_type}) for {language}")
+        logging.info(f"Audio file size: {os.path.getsize(audio_path)} bytes")
+
+        # Get speech service and transcribe
+        speech_service = get_speech_service()
+        result = speech_service.speech_to_text(audio_path, language)
+
+        # Clean up temporary file
+        try:
+            os.remove(audio_path)
+        except:
+            pass
+
+        if result['success']:
+            return jsonify({
+                "success": True,
+                "transcription": result['transcription'],
+                "confidence": result.get('confidence', 0.0),
+                "service": result.get('service', 'unknown'),
+                "language": result.get('language', language)
+            }), 200
+        else:
+            return jsonify({
+                "success": False,
+                "error": result.get('error', 'STT conversion failed')
+            }), 400
+
+    except Exception as e:
+        logging.exception(f"Error in speech_to_text_api: {str(e)}")
+        return jsonify({"error": "Server error during STT conversion", "message": str(e)}), 500
+
+@app.route('/api/speech/record-and-transcribe', methods=['POST'])
+def record_and_transcribe_api():
+    """Record audio from microphone and transcribe"""
+    try:
+        data = request.get_json()
+        language = data.get('language', 'english')
+        duration = data.get('duration', 5)  # Default 5 seconds
+
+        # Map language codes to full names
+        language_map = {
+            'hi': 'hindi',
+            'en': 'english', 
+            'mr': 'marathi'
+        }
+        language = language_map.get(language, language)
+
+        logging.info(f"Recording audio for {duration} seconds in {language}")
+
+        # Get speech service and record + transcribe
+        speech_service = get_speech_service()
+        result = speech_service.record_from_microphone(duration, language)
+
+        if result['success']:
+            return jsonify({
+                "success": True,
+                "transcription": result['transcription'],
+                "confidence": result.get('confidence', 0.0),
+                "service": result.get('service', 'unknown'),
+                "language": result.get('language', language),
+                "duration": result.get('recording_duration', duration)
+            }), 200
+        else:
+            return jsonify({
+                "success": False,
+                "error": result.get('error', 'Recording failed')
+            }), 400
+
+    except Exception as e:
+        logging.exception(f"Error in record_and_transcribe_api: {str(e)}")
+        return jsonify({"error": "Server error during recording", "message": str(e)}), 500
+
+@app.route('/api/speech/test', methods=['GET'])
+def test_speech_services():
+    """Test all speech services"""
+    try:
+        speech_service = get_speech_service()
+        test_results = speech_service.test_speech_services()
+        
+        return jsonify({
+            "success": True,
+            "test_results": test_results
+        }), 200
+
+    except Exception as e:
+        logging.exception(f"Error testing speech services: {str(e)}")
+        return jsonify({"error": "Error testing speech services", "message": str(e)}), 500
+
+@app.route('/api/speech/voices', methods=['GET'])
+def get_available_voices():
+    """Get available voices for a language"""
+    try:
+        language = request.args.get('language', 'english')
+        
+        speech_service = get_speech_service()
+        result = speech_service.get_available_voices(language)
+        
+        return jsonify(result), 200
+
+    except Exception as e:
+        logging.exception(f"Error getting voices: {str(e)}")
+        return jsonify({"error": "Error getting voices", "message": str(e)}), 500
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)
