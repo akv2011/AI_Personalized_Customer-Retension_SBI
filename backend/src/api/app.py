@@ -1,5 +1,6 @@
 from flask import Flask, request, jsonify
 import os
+from datetime import datetime
 from werkzeug.utils import secure_filename
 import google.generativeai as genai
 # --- Added imports for Google Search Grounding ---
@@ -18,6 +19,16 @@ from src.embedding_service.embedding_generator import EmbeddingGenerator
 from src.vector_database.vector_db_client import VectorDBClient
 from src.config.config import GOOGLE_API_KEY
 import logging # Added logging
+import asyncio # Add asyncio for database operations
+
+# Add database service imports
+try:
+    from src.database.database_service import get_database_service, initialize_database_service
+    from src.database.postgres_mcp_server import initialize_mcp_server
+    DATABASE_AVAILABLE = True
+except ImportError:
+    logging.warning("Database service not available. Running in FAISS-only mode.")
+    DATABASE_AVAILABLE = False
 
 app = Flask(__name__)
 CORS(app)
@@ -47,7 +58,7 @@ def allowed_file(filename):
 
 @app.route('/chat', methods=['POST'])
 def chat_api():
-    # ... existing chat_api implementation ...
+    """Enhanced chat API with PostgreSQL MCP Server integration"""
     try:
         data = request.get_json()
         customer_id = data.get('customer_id')
@@ -62,24 +73,62 @@ def chat_api():
         english_query = language_service.translate_to_english(user_input_text, user_language)
         logging.info(f"Translated query to English: '{english_query[:50]}...'")
 
+        db_storage_success = False
+        if DATABASE_AVAILABLE:
+            try:
+                async def store_interaction_async():
+                    from src.database.database_service import db_service
+                    from src.database.postgres_mcp_server import mcp_server
+                    
+                    # Initialize mcp_server and db_service for the current event loop
+                    await mcp_server.initialize()
+                    await db_service.initialize()
+
+                    db_result = await db_service.store_interaction(
+                        customer_id=customer_id,
+                        interaction_text=english_query,
+                        interaction_type="chatbot",
+                        user_language=user_language,
+                        additional_metadata={"api_endpoint": "chat"}
+                    )
+                    
+                    # Clean up mcp_server resources for this loop
+                    await mcp_server.close()
+                    return db_result
+
+                db_result = asyncio.run(store_interaction_async())
+                
+                if db_result["success"]:
+                    logging.info(f"Database storage successful: {db_result['conversation_id']}")
+                    db_storage_success = True
+                else:
+                    logging.warning(f"Database storage failed: {db_result.get('error')}")
+            except Exception as db_error:
+                logging.error(f"Database service error in chat_api: {db_error}")
+                # Ensure a response is still sent if DB operations fail
+        
         response = recommender.process_user_interaction(customer_id, english_query, user_language=user_language)
-        logging.info(f"Received response from recommender: {type(response)}")
+        
+        if isinstance(response, dict):
+            response['database_stored'] = db_storage_success
+        
+        logging.info(f"Received response from processing: {type(response)}")
 
         if isinstance(response, dict) and 'response' in response and not response.get('error'):
             original_english_response = response.get('original_llm_response', response['response'])
             logging.info(f"Original English response: '{original_english_response[:50]}...'")
             translated_response = language_service.translate_from_english(
-                response['response'], # Translate the potentially cleaned response
+                response['response'],
                 user_language
             )
             logging.info(f"Translated response to {user_language}: '{translated_response[:50]}...'")
-            response['original_response'] = original_english_response # Keep original LLM English response
-            response['response'] = translated_response # Overwrite with translated response
+            response['original_response'] = original_english_response
+            response['response'] = translated_response
             response['detected_language'] = user_language
         elif isinstance(response, dict) and response.get('error'):
-             logging.error(f"Recommender returned an error: {response.get('message')}")
+             logging.error(f"Processing returned an error: {response.get('message')}")
         else:
-            logging.warning(f"Unexpected response format from recommender: {response}")
+            logging.warning(f"Unexpected response format: {response}")
             if isinstance(response, dict):
                 response['response'] = response.get('response', "Sorry, I encountered an issue.")
             else:
@@ -269,6 +318,301 @@ def upload_pdf_api():
     else:
         logging.warning(f"Upload attempt with invalid file type: {file.filename}")
         return jsonify({"error": "Invalid file type. Only PDF files are allowed."}), 400
+
+# === Database API Endpoints ===
+
+@app.route('/api/customer/<customer_id>/profile', methods=['GET'])
+def get_customer_profile(customer_id):
+    """Get comprehensive customer profile"""
+    if not DATABASE_AVAILABLE:
+        return jsonify({"error": "Database service not available"}), 503
+    
+    try:
+        async def get_profile_async_wrapper():
+            from src.database.database_service import db_service
+            from src.database.postgres_mcp_server import mcp_server
+            
+            await mcp_server.initialize()
+            await db_service.initialize() # Ensures db_service uses the initialized mcp_server
+
+            profile_data = await db_service.get_customer_profile(customer_id)
+            
+            await mcp_server.close()
+            return profile_data
+        
+        result = asyncio.run(get_profile_async_wrapper())
+        
+        if result["success"]:
+            return jsonify(result["profile"]), 200
+        else:
+            logging.error(f"Profile retrieval failed for {customer_id}: {result.get('error')}")
+            return jsonify({"error": result.get("error", "Failed to get profile")}), 400
+            
+    except Exception as e:
+        logging.exception(f"Error getting customer profile for {customer_id}: {e}")
+        if isinstance(e, RuntimeError) and "event loop" in str(e).lower():
+            return jsonify({"error": "Event loop management issue", "detail": str(e)}), 500
+        return jsonify({"error": "Server error during profile retrieval", "detail": str(e)}), 500
+
+@app.route('/api/customer/<customer_id>/preferences', methods=['POST'])
+def update_customer_preferences(customer_id):
+    """Update customer preferences"""
+    if not DATABASE_AVAILABLE:
+        return jsonify({"error": "Database service not available"}), 503
+    
+    try:
+        data = request.get_json()
+        preference_type = data.get('preference_type')
+        preference_value = data.get('preference_value')
+        confidence_score = data.get('confidence_score', 0.5)
+        
+        if not preference_type or preference_value is None:
+            return jsonify({"error": "Missing preference_type or preference_value"}), 400
+        
+        async def update_preferences_wrapper():
+            from src.database.database_service import db_service
+            from src.database.postgres_mcp_server import mcp_server
+
+            await mcp_server.initialize()
+            await db_service.initialize()
+
+            update_result = await db_service.update_customer_preferences(
+                customer_id, preference_type, preference_value, confidence_score
+            )
+            
+            await mcp_server.close()
+            return update_result
+        
+        result = asyncio.run(update_preferences_wrapper())
+        
+        if result["success"]:
+            return jsonify({"message": "Preferences updated successfully"}), 200
+        else:
+            logging.error(f"Failed to update preferences for {customer_id}: {result.get('error')}")
+            return jsonify({"error": result.get("error", "Failed to update preferences")}), 400
+            
+    except Exception as e:
+        logging.exception(f"Error updating customer preferences for {customer_id}: {e}")
+        if isinstance(e, RuntimeError) and "event loop" in str(e).lower():
+            return jsonify({"error": "Event loop management issue", "detail": str(e)}), 500
+        return jsonify({"error": "Server error during preference update", "detail": str(e)}), 500
+
+@app.route('/api/customer/<customer_id>/similar-interactions', methods=['POST'])
+def search_similar_interactions(customer_id):
+    """Search for similar interactions"""
+    if not DATABASE_AVAILABLE:
+        return jsonify({"error": "Database service not available"}), 503
+    
+    try:
+        data = request.get_json()
+        query_text = data.get('query_text')
+        top_k = data.get('top_k', 5)
+        
+        if not query_text:
+            return jsonify({"error": "Missing query_text"}), 400
+        
+        async def search_interactions_wrapper():
+            from src.database.database_service import db_service
+            from src.database.postgres_mcp_server import mcp_server
+
+            await mcp_server.initialize()
+            await db_service.initialize()
+
+            search_result = await db_service.search_similar_interactions(customer_id, query_text, top_k)
+            
+            await mcp_server.close()
+            return search_result
+            
+        result = asyncio.run(search_interactions_wrapper())
+        
+        if result["success"]:
+            return jsonify(result), 200
+        else:
+            logging.error(f"Similar interactions search failed for {customer_id}: {result.get('error')}")
+            return jsonify({"error": result.get("error", "Search failed")}), 400
+            
+    except Exception as e:
+        logging.exception(f"Error searching similar interactions for {customer_id}: {e}")
+        if isinstance(e, RuntimeError) and "event loop" in str(e).lower():
+            return jsonify({"error": "Event loop management issue", "detail": str(e)}), 500
+        return jsonify({"error": "Server error during similar interactions search", "detail": str(e)}), 500
+
+@app.route('/api/analytics/summary', methods=['GET'])
+def get_analytics_summary():
+    """Get analytics summary"""
+    if not DATABASE_AVAILABLE:
+        return jsonify({"error": "Database service not available"}), 503
+    
+    try:
+        customer_id = request.args.get('customer_id')
+        days = int(request.args.get('days', 30))
+        
+        async def get_analytics_wrapper():
+            from src.database.database_service import db_service
+            from src.database.postgres_mcp_server import mcp_server
+
+            await mcp_server.initialize()
+            await db_service.initialize()
+
+            analytics_data = await db_service.get_analytics_summary(customer_id, days)
+            
+            await mcp_server.close()
+            return analytics_data
+            
+        result = asyncio.run(get_analytics_wrapper())
+        
+        if result["success"]:
+            return jsonify(result), 200
+        else:
+            logging.error(f"Analytics retrieval failed: {result.get('error')}")
+            return jsonify({"error": result.get("error", "Analytics failed")}), 400
+            
+    except Exception as e:
+        logging.exception(f"Error getting analytics: {e}")
+        if isinstance(e, RuntimeError) and "event loop" in str(e).lower():
+            return jsonify({"error": "Event loop management issue", "detail": str(e)}), 500
+        return jsonify({"error": "Server error during analytics retrieval", "detail": str(e)}), 500
+
+@app.route('/api/database/status', methods=['GET'])
+def get_database_status():
+    """Get database and MCP server status"""
+    try:
+        status = {
+            "database_available": DATABASE_AVAILABLE,
+            "timestamp": datetime.now().isoformat()
+        }
+        
+        if DATABASE_AVAILABLE:
+            try:
+                # Use threading to avoid event loop conflicts
+                import threading
+                import queue
+                
+                result_queue = queue.Queue()
+                
+                def check_db_status():
+                    try:
+                        loop = asyncio.new_event_loop()
+                        asyncio.set_event_loop(loop)
+                        
+                        async def check_status():
+                            db_service = await get_database_service()
+                            return db_service is not None
+                        
+                        db_healthy = loop.run_until_complete(check_status())
+                        loop.close()
+                        result_queue.put(("success", db_healthy))
+                    except Exception as e:
+                        result_queue.put(("error", str(e)))
+                
+                thread = threading.Thread(target=check_db_status)
+                thread.start()
+                thread.join(timeout=10)  # 10 second timeout
+                
+                if thread.is_alive():
+                    status["database_healthy"] = False
+                    status["mcp_server"] = "timeout"
+                else:
+                    result_status, result = result_queue.get_nowait()
+                    if result_status == "success":
+                        status["database_healthy"] = result
+                        status["mcp_server"] = "operational" if result else "error"
+                    else:
+                        status["database_healthy"] = False
+                        status["mcp_server"] = "error"
+                        status["error"] = result
+            except Exception as e:
+                status["database_healthy"] = False
+                status["mcp_server"] = "error"
+                status["error"] = str(e)
+        
+        return jsonify(status), 200
+        
+    except Exception as e:
+        logging.exception(f"Error checking database status: {e}")
+        return jsonify({"error": "Server error", "message": str(e)}), 500
+
+@app.route('/api/mcp/operations', methods=['GET'])
+def get_mcp_operations():
+    """Get recent MCP operations for monitoring"""
+    if not DATABASE_AVAILABLE:
+        return jsonify({"error": "Database service not available"}), 503
+    
+    try:
+        limit = int(request.args.get('limit', 10))
+        
+        async def get_operations_async():
+            from src.database.postgres_mcp_server import PostgresMCPServer
+            mcp_server = PostgresMCPServer()
+            await mcp_server.initialize()
+            
+            # Use $1 parameter instead of %s for PostgreSQL
+            result = await mcp_server.execute_query("""
+                SELECT operation_id, operation_type, status, created_at, 
+                       execution_time_ms, error_message
+                FROM mcp_operations 
+                ORDER BY created_at DESC 
+                LIMIT $1
+            """, [limit])
+            
+            await mcp_server.close()
+            return result
+        
+        # Run in a new event loop
+        try:
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+            result = loop.run_until_complete(get_operations_async())
+            loop.close()
+        except RuntimeError:
+            # If we can't create a new loop, try to get the existing one
+            result = asyncio.create_task(get_operations_async())
+            result = asyncio.get_event_loop().run_until_complete(result)
+        
+        if result["success"]:
+            return jsonify({
+                "success": True,
+                "operations": result["rows"],
+                "count": len(result["rows"])
+            }), 200
+        else:
+            return jsonify({"error": result.get("error", "Failed to get operations")}), 400
+            
+    except Exception as e:
+        logging.exception(f"Error getting MCP operations: {e}")
+        return jsonify({"error": "Server error", "message": str(e)}), 500
+
+if __name__ == '__main__':
+    app.run(debug=True, host='0.0.0.0', port=5000)
+def database_status():
+    """Check database connectivity status"""
+    status = {
+        "database_available": DATABASE_AVAILABLE,
+        "faiss_available": True,  # FAISS is always available
+        "services": {}
+    }
+    
+    if DATABASE_AVAILABLE:
+        try:
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+            
+            async def check_services():
+                from src.database.postgres_mcp_server import mcp_server
+                # Simple connectivity test
+                result = await mcp_server.execute_query("SELECT 1 as test")
+                return result["success"]
+            
+            postgres_status = loop.run_until_complete(check_services())
+            loop.close()
+            
+            status["services"]["postgresql_mcp"] = postgres_status
+            
+        except Exception as e:
+            logging.error(f"Database status check failed: {e}")
+            status["services"]["postgresql_mcp"] = False
+    
+    return jsonify(status), 200
 
 if __name__ == '__main__':
     logging.info("Starting Flask application...")
