@@ -18,7 +18,7 @@ from src.embedding_service.embedding_generator import EmbeddingGenerator
 from src.vector_database.vector_db_client import VectorDBClient
 from src.config.config import GOOGLE_API_KEY
 # Add import for Smart Swadhan guidance
-from src.web_scraping.hyper_sbi_scraper import get_smart_swadhan_guidance_sync
+from src.web_scraping.hybrid_scraper import get_hybrid_smart_swadhan_guidance
 import logging # Added logging
 
 app = Flask(__name__)
@@ -207,32 +207,41 @@ def gemini_search_api():
 
 @app.route('/smart_swadhan_guidance', methods=['POST'])
 def smart_swadhan_guidance_api():
-    """API endpoint for Smart Swadhan Supreme navigation guidance"""
+    """API endpoint for Smart Swadhan Supreme navigation guidance with hybrid scraping"""
     try:
         data = request.get_json()
         user_query = data.get('query', 'Guide me to Smart Swadhan Supreme')
         
         logging.info(f"Smart Swadhan guidance requested: {user_query}")
         
-        # Get AI-powered guidance
-        guidance_result = get_smart_swadhan_guidance_sync(user_query)
+        # Get AI-powered guidance with hybrid scraping
+        guidance_result = get_hybrid_smart_swadhan_guidance(user_query)
         
         if guidance_result.get('success'):
-            logging.info("Smart Swadhan guidance generated successfully")
+            mode = guidance_result.get('mode', 'unknown')
+            processing_time = guidance_result.get('processing_time', 0)
+            
+            logging.info(f"Smart Swadhan guidance generated successfully using {mode} in {processing_time:.2f}s")
+            
             return jsonify({
                 "success": True,
+                "mode": mode,
                 "guidance": guidance_result.get('guidance'),
-                "navigation_steps": guidance_result.get('navigation_data', {}).get('navigation_steps', []),
-                "product_summary": guidance_result.get('guidance', {}).get('product_summary', ''),
+                "navigation_steps": guidance_result.get('navigation_steps', []),
+                "product_summary": guidance_result.get('product_summary', ''),
                 "total_steps": guidance_result.get('guidance', {}).get('total_steps', 0),
-                "recommended_actions": guidance_result.get('guidance', {}).get('recommended_actions', [])
+                "recommended_actions": guidance_result.get('guidance', {}).get('recommended_actions', []),
+                "processing_time": processing_time,
+                "note": guidance_result.get('note', ''),
+                "timestamp": guidance_result.get('timestamp')
             }), 200
         else:
             logging.error(f"Failed to generate Smart Swadhan guidance: {guidance_result.get('error')}")
             return jsonify({
                 "success": False,
                 "error": guidance_result.get('error', 'Unknown error'),
-                "message": "Failed to generate navigation guidance"
+                "message": "Failed to generate navigation guidance",
+                "mode": guidance_result.get('mode', 'unknown')
             }), 500
             
     except Exception as e:

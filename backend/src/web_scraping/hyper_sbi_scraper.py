@@ -17,15 +17,145 @@ class HyperSBIScraper:
         self.base_url = "https://www.sbilife.co.in"
         self.navigation_history = []
         
+        # Product definitions based on the screenshot
+        self.sbi_products = {
+            "smart swadhan supreme": {
+                "category": "Protection Plans",
+                "description": "Traditional plan with guaranteed benefits and life cover",
+                "key_features": [
+                    "Life cover with guaranteed returns",
+                    "Multiple premium payment options",
+                    "Maturity benefits with loyalty additions",
+                    "Death benefit protection",
+                    "Tax benefits under Section 80C and 10(10D)"
+                ]
+            },
+            "smart swadhan neo": {
+                "category": "Protection Plans", 
+                "description": "Enhanced traditional plan with flexible options",
+                "key_features": [
+                    "Flexible premium payment terms",
+                    "Higher sum assured options",
+                    "Loyalty additions at maturity",
+                    "Comprehensive life protection",
+                    "Tax efficient investment"
+                ]
+            },
+            "saral swadhan supreme": {
+                "category": "Protection Plans",
+                "description": "Simple and affordable traditional life insurance",
+                "key_features": [
+                    "Simple and easy to understand plan",
+                    "Affordable premium options",
+                    "Guaranteed maturity benefits",
+                    "Life cover throughout policy term",
+                    "Suitable for long-term wealth creation"
+                ]
+            },
+            "saral jeevan bima": {
+                "category": "Protection Plans",
+                "description": "Pure protection plan with affordable premiums",
+                "key_features": [
+                    "Pure term life insurance",
+                    "High life cover at affordable premiums",
+                    "Multiple premium payment options",
+                    "Option to convert to other plans",
+                    "Simple documentation process"
+                ]
+            },
+            "eshield next": {
+                "category": "Protection Plans",
+                "description": "Comprehensive protection with health benefits",
+                "key_features": [
+                    "Life and health protection combined",
+                    "Critical illness cover",
+                    "Accidental death benefit",
+                    "Premium waiver on disability",
+                    "Comprehensive family protection"
+                ]
+            },
+            "eshield insta": {
+                "category": "Protection Plans",
+                "description": "Instant online protection plan",
+                "key_features": [
+                    "Instant online purchase",
+                    "Quick policy issuance",
+                    "High sum assured options",
+                    "Minimal documentation",
+                    "Digital-first experience"
+                ]
+            },
+            "smart shield premier": {
+                "category": "Protection Plans",
+                "description": "Premium protection with additional benefits",
+                "key_features": [
+                    "Enhanced protection coverage",
+                    "Multiple benefit options",
+                    "Premium waiver benefits",
+                    "Flexible premium payment",
+                    "Additional accident benefits"
+                ]
+            },
+            "smart shield": {
+                "category": "Protection Plans", 
+                "description": "Basic protection plan with essential benefits",
+                "key_features": [
+                    "Essential life protection",
+                    "Affordable premiums",
+                    "Basic accident cover",
+                    "Simple terms and conditions",
+                    "Quick claim settlement"
+                ]
+            }
+        }
+    
+    def detect_product_from_query(self, user_query: str) -> str:
+        """Detect which product the user is asking about"""
+        query_lower = user_query.lower()
+        
+        # Check for exact matches first
+        for product_key in self.sbi_products.keys():
+            if product_key in query_lower:
+                logger.info(f"Detected product: {product_key}")
+                return product_key
+        
+        # Check for partial matches
+        if "swadhan supreme" in query_lower:
+            return "smart swadhan supreme"
+        elif "swadhan neo" in query_lower:
+            return "smart swadhan neo" 
+        elif "saral swadhan" in query_lower:
+            return "saral swadhan supreme"
+        elif "saral jeevan" in query_lower or "jeevan bima" in query_lower:
+            return "saral jeevan bima"
+        elif "eshield next" in query_lower or "e-shield next" in query_lower:
+            return "eshield next"
+        elif "eshield insta" in query_lower or "e-shield insta" in query_lower:
+            return "eshield insta"
+        elif "shield premier" in query_lower:
+            return "smart shield premier"
+        elif "smart shield" in query_lower:
+            return "smart shield"
+        
+        # Default to Smart Swadhan Supreme
+        logger.info("No specific product detected, defaulting to Smart Swadhan Supreme")
+        return "smart swadhan supreme"
+        
     async def create_ai_guided_navigation(self, user_query: str) -> Dict[str, Any]:
-        """Create AI-guided navigation steps for Smart Swadhan Supreme"""
+        """Create AI-guided navigation steps for any SBI Life product"""
+        
+        # Detect which product the user wants
+        detected_product = self.detect_product_from_query(user_query)
+        product_info = self.sbi_products[detected_product]
+        
+        logger.info(f"Creating navigation for: {detected_product.title()}")
         
         # Simulate the navigation steps based on the images provided
         navigation_steps = [
             {
                 "step": 1,
                 "title": "SBI Life Homepage",
-                "description": "Starting at the SBI Life homepage with the main navigation menu",
+                "description": f"Starting at the SBI Life homepage to find {detected_product.title()}",
                 "action": "Navigate to SBI Life homepage",
                 "visual_elements": [
                     "SBI Life logo with 25 years celebration",
@@ -40,7 +170,7 @@ class HyperSBIScraper:
             {
                 "step": 2,
                 "title": "Products Menu Dropdown",
-                "description": "Hovering over PRODUCTS shows dropdown with Individual Life Insurance Plans",
+                "description": f"Hovering over PRODUCTS shows dropdown with Individual Life Insurance Plans for {detected_product.title()}",
                 "action": "Hover over PRODUCTS in main navigation",
                 "visual_elements": [
                     "Individual Life Insurance Plans option",
@@ -54,7 +184,7 @@ class HyperSBIScraper:
             {
                 "step": 3,
                 "title": "Individual Life Insurance Plans",
-                "description": "Viewing the individual plans menu with various product categories",
+                "description": f"Viewing the individual plans menu to locate {detected_product.title()}",
                 "action": "Click on Individual Life Insurance Plans",
                 "visual_elements": [
                     "Online Plans",
@@ -66,36 +196,38 @@ class HyperSBIScraper:
                     "Left sidebar with plan categories",
                     "Main content area with plan listings"
                 ],
-                "next_action": "Look for Smart Swadhan Supreme in the plan listings",
+                "next_action": f"Look for {detected_product.title()} in the {product_info['category']} section",
                 "screenshot_description": "Individual plans page showing different plan categories"
             },
             {
                 "step": 4,
-                "title": "Smart Swadhan Supreme Product List",
-                "description": "Finding Smart Swadhan Supreme in the product listings",
-                "action": "Locate Smart Swadhan Supreme in the product list",
+                "title": f"{detected_product.title()} Product List",
+                "description": f"Finding {detected_product.title()} in the product listings",
+                "action": f"Locate {detected_product.title()} in the product list",
                 "visual_elements": [
                     "SBI Life - eShield Next",
                     "SBI Life - Saral Jeevan Bima", 
-                    "SBI Life - Smart Swadhan Supreme (highlighted)",
+                    f"SBI Life - {detected_product.title()} (highlighted)",
                     "SBI Life - eShield Insta",
                     "SBI Life - Smart Shield Premier",
                     "SBI Life - Smart Shield",
+                    "SBI Life - Smart Swadhan Neo",
+                    "SBI Life - Saral Swadhan Supreme",
                     "Product cards with brief descriptions"
                 ],
-                "next_action": "Click on 'SBI Life - Smart Swadhan Supreme' to view product details",
-                "screenshot_description": "Product listing page with Smart Swadhan Supreme highlighted"
+                "next_action": f"Click on 'SBI Life - {detected_product.title()}' to view product details",
+                "screenshot_description": f"Product listing page with {detected_product.title()} highlighted"
             },
             {
                 "step": 5,
-                "title": "Smart Swadhan Supreme Product Details",
-                "description": "Detailed product page for Smart Swadhan Supreme",
-                "action": "View Smart Swadhan Supreme product details",
+                "title": f"{detected_product.title()} Product Details",
+                "description": f"Detailed product page for {detected_product.title()}",
+                "action": f"View {detected_product.title()} product details",
                 "visual_elements": [
-                    "Product title: 'An Individual, Non-Linked, Non-Participating Life Insurance Savings Product'",
-                    "UIN: 111N140V02",
-                    "Product description about family security and premium return",
-                    "Key feature tags: Protection, Security, Return of Premium, Tax Benefits",
+                    f"Product title: '{detected_product.title()}'",
+                    f"Product description: {product_info['description']}",
+                    "UIN number and regulatory information",
+                    "Key feature tags and benefits",
                     "Key Features section",
                     "Plan Advantages section", 
                     "Calculate Premium button (blue)",
@@ -104,21 +236,19 @@ class HyperSBIScraper:
                     "Talk to Advisor button"
                 ],
                 "next_action": "Extract detailed product information and features",
-                "screenshot_description": "Complete product details page with features and benefits"
+                "screenshot_description": f"Complete product details page for {detected_product.title()}"
             },
             {
                 "step": 6,
                 "title": "Product Information Extraction",
-                "description": "Extracting key product details for the chatbot",
+                "description": f"Extracting key product details for {detected_product.title()}",
                 "action": "Extract comprehensive product information",
                 "extracted_data": {
-                    "product_name": "SBI Life - Smart Swadhan Supreme",
-                    "uin": "111N140V02",
-                    "type": "Individual, Non-Linked, Non-Participating Life Insurance Savings Product",
-                    "key_features": [
-                        "Life insurance protection for family security",
-                        "Return of total premium paid at policy maturity",
-                        "Affordable premium structure",
+                    "product_name": f"SBI Life - {detected_product.title()}",
+                    "category": product_info['category'],
+                    "description": product_info['description'],
+                    "key_features": product_info['key_features'],
+                    "additional_features": [
                         "Tax benefits under current tax laws",
                         "Non-linked product with guaranteed benefits",
                         "Flexible policy terms available"
@@ -142,7 +272,7 @@ class HyperSBIScraper:
                         "Talk to Advisor"
                     ]
                 },
-                "screenshot_description": "Product information summary for chatbot integration"
+                "screenshot_description": f"Product information summary for {detected_product.title()}"
             }
         ]
         
@@ -152,6 +282,7 @@ class HyperSBIScraper:
         return {
             "success": True,
             "query": user_query,
+            "detected_product": detected_product,
             "navigation_steps": navigation_steps,
             "total_steps": len(navigation_steps),
             "final_product_data": navigation_steps[-1]["extracted_data"],
@@ -253,12 +384,12 @@ class HyperSBIScraper:
 
 # Main async function for API integration
 async def get_smart_swadhan_guidance(user_query: str = "Guide me to Smart Swadhan Supreme") -> Dict[str, Any]:
-    """Main function to get Smart Swadhan Supreme guidance for chatbot"""
+    """Main function to get any SBI Life product guidance for chatbot"""
     
     try:
         scraper = HyperSBIScraper()
         
-        # Get AI-guided navigation data
+        # Get AI-guided navigation data (now supports any product)
         navigation_data = await scraper.create_ai_guided_navigation(user_query)
         
         # Generate chatbot guidance
@@ -268,6 +399,7 @@ async def get_smart_swadhan_guidance(user_query: str = "Guide me to Smart Swadha
             "success": True,
             "guidance": guidance_data,
             "navigation_data": navigation_data,
+            "detected_product": navigation_data.get("detected_product", "smart swadhan supreme"),
             "query": user_query,
             "timestamp": time.time()
         }
