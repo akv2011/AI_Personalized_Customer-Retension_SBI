@@ -61,19 +61,43 @@ const ChatInterface = () => {
       console.log("Attempting to send message:", currentInputText); // Log 1: Before fetch
       console.log("Gemini Search Active:", isGeminiSearchActive); // Log if Gemini Search is active
 
-      // Check if user is asking about Smart Swadhan guidance
-      const smartSwadhanKeywords = [
-        'smart swadhan', 'swadhan supreme', 'guide me to smart swadhan', 
-        'show me smart swadhan', 'navigate to smart swadhan', 'smart swadhan scheme',
-        'how to find smart swadhan', 'where is smart swadhan', 'smart swadhan supreme page'
+      // Check if user is asking about SBI Life product guidance (extended for all products)
+      const sbiProductKeywords = [
+        // Smart Swadhan Products
+        'smart swadhan supreme', 'smart swadhan neo', 'smart swadhan',
+        'swadhan supreme', 'swadhan neo', 'swadhan',
+        
+        // Saral Products
+        'saral swadhan supreme', 'saral swadhan', 'saral jeevan bima', 'saral jeevan',
+        
+        // eShield Products
+        'eshield next', 'e-shield next', 'eshield insta', 'e-shield insta', 'eshield', 'e-shield',
+        
+        // Smart Shield Products
+        'smart shield premier', 'smart shield', 'shield premier',
+        
+        // General guidance keywords
+        'guide me to', 'show me', 'navigate to', 'find', 'where is', 
+        'how to find', 'product page', 'scheme', 'plan'
       ];
       
-      const isSmartSwadhanQuery = smartSwadhanKeywords.some(keyword => 
+      // Check if the query contains any SBI product + guidance keywords combination
+      const productMentioned = sbiProductKeywords.some(keyword => 
         currentInputText.toLowerCase().includes(keyword.toLowerCase())
       );
+      
+      const guidanceRequested = [
+        'guide', 'show', 'navigate', 'find', 'where', 'how', 'page', 'help'
+      ].some(keyword => currentInputText.toLowerCase().includes(keyword));
+      
+      const isSBIProductGuidanceQuery = productMentioned && (guidanceRequested || 
+        currentInputText.toLowerCase().includes('live scrape') ||
+        currentInputText.toLowerCase().includes('real time') ||
+        currentInputText.toLowerCase().includes('guidance')
+      );
 
-      if (isSmartSwadhanQuery) {
-        console.log("Smart Swadhan guidance detected, showing visual guide");
+      if (isSBIProductGuidanceQuery) {
+        console.log("SBI Life product guidance detected, showing visual guide for:", currentInputText);
         setCurrentGuidanceQuery(currentInputText);
         setShowSmartSwadhanGuidance(true);
         setIsThinking(false);
@@ -85,7 +109,7 @@ const ChatInterface = () => {
             sections: [
               {
                 type: 'main_response',
-                content: "🎯 I'll show you exactly how to navigate to Smart Swadhan Supreme! Opening visual step-by-step guidance..."
+                content: "🎯 I'll show you exactly how to navigate to your requested SBI Life product! Opening visual step-by-step guidance..."
               }
             ]
           },

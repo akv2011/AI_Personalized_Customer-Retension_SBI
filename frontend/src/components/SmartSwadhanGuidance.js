@@ -19,13 +19,24 @@ const SmartSwadhanGuidance = ({ isVisible, onClose, userQuery = "" }) => {
   const [guidanceData, setGuidanceData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [isAutoPlay, setIsAutoPlay] = useState(false);
+  const [scrapingMode, setScrapingMode] = useState('');
+  const [processingTime, setProcessingTime] = useState(0);
 
-  // Fetch guidance data when component becomes visible
+  // Fetch guidance data when component becomes visible OR when userQuery changes
   useEffect(() => {
-    if (isVisible && !guidanceData) {
+    if (isVisible) {
+      // Always fetch fresh data when query changes or component becomes visible
       fetchGuidanceData();
     }
-  }, [isVisible]);
+  }, [isVisible, userQuery]); // Added userQuery as dependency
+
+  // Reset current step when userQuery changes
+  useEffect(() => {
+    if (userQuery) {
+      setCurrentStep(0);
+      setGuidanceData(null); // Clear previous data
+    }
+  }, [userQuery]);
 
   // Auto-play functionality
   useEffect(() => {
@@ -44,7 +55,7 @@ const SmartSwadhanGuidance = ({ isVisible, onClose, userQuery = "" }) => {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
-          query: userQuery || 'Guide me to Smart Swadhan Supreme scheme' 
+          query: userQuery || 'Guide me to SBI Life product' 
         }),
       });
 
@@ -55,6 +66,8 @@ const SmartSwadhanGuidance = ({ isVisible, onClose, userQuery = "" }) => {
       const data = await response.json();
       console.log('Guidance data received:', data);
       setGuidanceData(data);
+      setScrapingMode(data.mode || 'unknown');
+      setProcessingTime(data.processing_time || 0);
     } catch (error) {
       console.error('Error fetching guidance data:', error);
       // Set fallback data in case of error
@@ -185,7 +198,25 @@ const SmartSwadhanGuidance = ({ isVisible, onClose, userQuery = "" }) => {
         {/* Header */}
         <div className="bg-gradient-to-r from-red-600 to-purple-600 text-white p-6">
           <div className="flex justify-between items-center">
-            <h2 className="text-2xl font-bold">Smart Swadhan Supreme - Navigation Guide</h2>
+            <div>
+              <h2 className="text-2xl font-bold">SBI Life Product - Navigation Guide</h2>
+              {scrapingMode && (
+                <div className="flex items-center mt-2 space-x-4">
+                  <span className={`px-3 py-1 rounded-full text-xs font-medium ${
+                    scrapingMode === 'real_time_scraping' 
+                      ? 'bg-green-500 text-white' 
+                      : 'bg-blue-500 text-white'
+                  }`}>
+                    {scrapingMode === 'real_time_scraping' ? '🌐 Live Scraping' : '⚡ Fast Simulation'}
+                  </span>
+                  {processingTime > 0 && (
+                    <span className="text-sm opacity-90">
+                      ⏱️ {processingTime.toFixed(2)}s
+                    </span>
+                  )}
+                </div>
+              )}
+            </div>
             <button
               onClick={onClose}
               className="text-white hover:text-gray-200 transition-colors"
@@ -338,6 +369,12 @@ const SmartSwadhanGuidance = ({ isVisible, onClose, userQuery = "" }) => {
             <span className="text-sm text-gray-600">
               Click steps to jump around or use auto-play
             </span>
+            
+            {guidanceData?.note && (
+              <span className="text-xs text-gray-500 max-w-xs truncate">
+                💡 {guidanceData.note}
+              </span>
+            )}
           </div>
 
           <div className="flex space-x-2">
