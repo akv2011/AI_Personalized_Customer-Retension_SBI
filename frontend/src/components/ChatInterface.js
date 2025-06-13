@@ -1,8 +1,9 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Send, User, Bot, Paperclip, Mic, MicOff, Circle, FileText, Calendar, Phone, Bell, Settings, Globe, Search, Navigation, Volume2, LogOut, MessageSquarePlus } from 'lucide-react';
+import { Send, User, Bot, Paperclip, Mic, MicOff, Circle, FileText, Calendar, Phone, Bell, Settings, Globe, Search, Navigation, Volume2, LogOut, MessageSquarePlus, BarChart3 } from 'lucide-react';
 import MessageBubble from './MessageBubble';
 import SmartSwadhanGuidance from './SmartSwadhanGuidance';
 import MockAuth from './MockAuth';
+import Dashboard from './Dashboard';
 
 const ChatInterface = () => {
   // Authentication state
@@ -13,6 +14,8 @@ const ChatInterface = () => {
   const [isLoadingHistory, setIsLoadingHistory] = useState(false);
   // Show/hide new chat confirmation
   const [showNewChatConfirm, setShowNewChatConfirm] = useState(false);
+  // Show/hide dashboard
+  const [showDashboard, setShowDashboard] = useState(false);
   
   // Authentication handlers
   const handleLogin = (userSession) => {
@@ -105,6 +108,14 @@ const ChatInterface = () => {
     
     // Close confirmation dialog
     setShowNewChatConfirm(false);
+  };
+
+  const handleDashboard = () => {
+    if (!currentUser) {
+      setShowLoginModal(true);
+      return;
+    }
+    setShowDashboard(true);
   };
 
   // Add this at the beginning of the component to show login modal on load
@@ -664,43 +675,6 @@ const ChatInterface = () => {
       setInputText('');
       setIsThinking(true);
 
-      // Check for SBI product guidance
-      const sbiProductKeywords = [
-        'smart swadhan supreme', 'smart swadhan neo', 'smart swadhan',
-        'saral swadhan supreme', 'saral swadhan', 'saral jeevan bima',
-        'eshield next', 'eshield insta', 'eshield',
-        'smart shield premier', 'smart shield'
-      ];
-      
-      const productMentioned = sbiProductKeywords.some(keyword => 
-        currentInputText.toLowerCase().includes(keyword.toLowerCase())
-      );
-      
-      const guidanceRequested = ['guide', 'show', 'navigate', 'find', 'where', 'how', 'page', 'help']
-        .some(keyword => currentInputText.toLowerCase().includes(keyword));
-      
-      if (productMentioned && guidanceRequested) {
-        setCurrentGuidanceQuery(currentInputText);
-        setShowSmartSwadhanGuidance(true);
-        setIsThinking(false);
-        
-        const guidanceMessage = {
-          id: messages.length + 2,
-          text: {
-            sections: [
-              {
-                type: 'main_response',
-                content: "🎯 I'll show you exactly how to navigate to your requested SBI Life product! Opening visual step-by-step guidance..."
-              }
-            ]
-          },
-          isBot: true,
-          showGuidanceButton: true
-        };
-        setMessages(prev => [...prev, guidanceMessage]);
-        return;
-      }
-
       try {
         const endpoint = isExaSearchActive ? 'http://127.0.0.1:5000/gemini_search' : 'http://127.0.0.1:5000/chat';
         const body = isExaSearchActive
@@ -721,6 +695,13 @@ const ChatInterface = () => {
           const data = await response.json();
           const responseText = data.response || "I apologize, but I couldn't process that request.";
           
+          // Check if backend indicates visual guidance should be shown
+          if (data.show_visual_guidance) {
+            console.log("Backend triggered visual guidance, opening SmartSwadhanGuidance modal");
+            setCurrentGuidanceQuery(currentInputText);
+            setShowSmartSwadhanGuidance(true);
+          }
+          
           const botMessage = {
             id: messages.length + 2,
             text: {
@@ -732,6 +713,7 @@ const ChatInterface = () => {
               ]
             },
             isBot: true,
+            showGuidanceButton: data.show_visual_guidance || false, // Add guidance button if backend indicates
           };
 
           setMessages(prev => [...prev, botMessage]);
@@ -827,6 +809,13 @@ const ChatInterface = () => {
                 <span className="text-xs text-white overflow-hidden whitespace-nowrap overflow-ellipsis max-w-[80px]">
                   {currentUser.name}
                 </span>
+                <button 
+                  onClick={handleDashboard} 
+                  title="Open Dashboard" 
+                  className="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center hover:bg-blue-600 transition-colors"
+                >
+                  <BarChart3 className="w-4 h-4 text-white" />
+                </button>
                 <button 
                   onClick={handleNewChat} 
                   title="Start New Chat" 
@@ -1071,6 +1060,13 @@ const ChatInterface = () => {
           </div>
         </div>
       )}
+      
+      {/* Dashboard Modal */}
+      <Dashboard 
+        isVisible={showDashboard}
+        onClose={() => setShowDashboard(false)}
+        currentUser={currentUser}
+      />
     </div>
   );
 };
