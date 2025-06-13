@@ -94,16 +94,23 @@ class RecommendationEngine:
         """Processes user interaction with enhanced database integration, stores it in FAISS and PostgreSQL, gets a personalized response, and updates chat history."""
         conversation_turn_id = f"{customer_id}_{int(pd.Timestamp.now().timestamp())}"
         
-        # Check if this is a Smart Swadhan guidance request
-        smart_swadhan_keywords = [
-            'smart swadhan', 'swadhan supreme', 'guide me to smart swadhan', 
-            'show me smart swadhan', 'navigate to smart swadhan', 'smart swadhan scheme',
-            'how to find smart swadhan', 'where is smart swadhan', 'smart swadhan supreme page'
+        # Check if this is a Smart Swadhan guidance request (explicit guidance intent required)
+        guidance_keywords = [
+            'guide me', 'show me', 'navigate', 'navigate to', 'how to find', 'where is', 
+            'find', 'take me to', 'direct me to', 'lead me to'
         ]
         
-        is_smart_swadhan_query = any(keyword in interaction_text.lower() for keyword in smart_swadhan_keywords)
+        smart_swadhan_products = [
+            'smart swadhan', 'swadhan supreme', 'smart swadhan scheme', 'smart swadhan supreme page'
+        ]
         
-        if is_smart_swadhan_query:
+        # Only trigger visual guidance if BOTH guidance intent AND Smart Swadhan product are mentioned
+        has_guidance_intent = any(keyword in interaction_text.lower() for keyword in guidance_keywords)
+        has_smart_swadhan_mention = any(product in interaction_text.lower() for product in smart_swadhan_products)
+        
+        is_smart_swadhan_guidance_request = has_guidance_intent and has_smart_swadhan_mention
+        
+        if is_smart_swadhan_guidance_request:
             # Return special response indicating visual guidance should be shown
             return {
                 "response": "🎯 I'll show you exactly how to navigate to Smart Swadhan Supreme! This is a comprehensive Individual, Non-Linked, Non-Participating Life Insurance Savings Product (UIN: 111N140V02) that combines life protection with guaranteed return of premiums. Let me open the visual step-by-step navigation guide for you.",
@@ -272,8 +279,8 @@ class RecommendationEngine:
             {"role": "system", "content": self.system_prompt},
             *history,
             {"role": "system", "content": f"Context from similar past interactions or documents:\n{context_string}" if context_string else "No relevant context found in knowledge base."},
-            # Pass the user input in English for sentiment analysis by the LLM
-            {"role": "user", "content": f"User query (English for analysis): {user_input_text}\nRespond considering this query and the history, addressing the user in language code: {user_language}."}
+            # Pass the user input in English for analysis but specify response language clearly
+            {"role": "user", "content": f"User query: {user_input_text}\nuser_language: {user_language}\n\nPlease respond to this query ONLY in the language specified by user_language code. Do not mix languages in your response."}
         ]
 
         try:

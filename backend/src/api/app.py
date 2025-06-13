@@ -3,6 +3,8 @@ import os
 from datetime import datetime
 from werkzeug.utils import secure_filename
 import google.generativeai as genai
+# Import config to load environment variables
+from config import config
 # --- Added imports for Google Search Grounding ---
 # Remove the incorrect import line below
 # from google.generativeai.types import Tool, GenerateContentConfig, GoogleSearch 
@@ -181,15 +183,11 @@ def chat_api():
         logging.info(f"Received response from processing: {type(response)}")
 
         if isinstance(response, dict) and 'response' in response and not response.get('error'):
+            # Don't translate the response since OpenAI already generated it in the correct language
+            # based on the user_language parameter in the system prompt
             original_english_response = response.get('original_llm_response', response['response'])
-            logging.info(f"Original English response: '{original_english_response[:50]}...'")
-            translated_response = language_service.translate_from_english(
-                response['response'],
-                user_language
-            )
-            logging.info(f"Translated response to {user_language}: '{translated_response[:50]}...'")
+            logging.info(f"Response generated in target language {user_language}: '{response['response'][:50]}...'")
             response['original_response'] = original_english_response
-            response['response'] = translated_response
             response['detected_language'] = user_language
         elif isinstance(response, dict) and response.get('error'):
              logging.error(f"Processing returned an error: {response.get('message')}")
