@@ -27,10 +27,11 @@ This AI-powered customer retention chatbot for SBI Life Insurance uses advanced 
 
 **Expected Response:** Provides detailed navigation guidance through the SBI Life website, including screenshots descriptions and exact steps to locate and purchase the product.
 
-### Advanced Analytics Query
-**Prompt:** "Based on successful customer purchase patterns in your database, what's the optimal approach for someone like me to select the right insurance plan?"
+### Profile Building - Initial Contact
+**Prompt 1:** "Hi, I'm looking for life insurance coverage for my family. I'm 32 years old, married with one child, and work as a software engineer with an annual income of ₹12 lakhs. I'm particularly concerned about securing my family's financial future if something happens to me."
 
-**Expected Response:** Leverages customer analytics, successful purchase paths from FAISS database, and provides data-driven recommendations with success probability scores.
+**Expected Response:** Captures demographic profile (age: 32, married, 1 child, IT professional, income: ₹12L), identifies primary concern (family financial security), and asks follow-up questions about existing coverage, specific goals, and risk tolerance.
+
 
 ---
 
